@@ -2,12 +2,13 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Whiteboard } from './components/Whiteboard';
 import { AgentPanel } from './components/AgentPanel';
-import { MindMapProject, MindMapNode, NodeType, ViewSettings, Canvas, AgentMessage, AgentOperation } from './types';
-import { INITIAL_DATA, LABELS, TYPE_DESCRIPTIONS, AGENT_ICONS } from './constants';
-import { 
-  addNode, 
-  deleteNode, 
-  updateNode, 
+import { CanvasDrawer } from './components/layout/CanvasDrawer';
+import { MindMapNode, NodeType, ViewSettings } from './types';
+import { INITIAL_DATA, LABELS } from './constants';
+import {
+  addNode,
+  deleteNode,
+  updateNode,
   getPathToNode,
   updateRootPosition,
   getParentId,
@@ -17,33 +18,66 @@ import {
   getContextJsonString,
   getLayoutBounds,
   calculateTreeLayout,
-  serializeForestForAgent
 } from './utils/layout';
-import { generateBrainstormIdeas, chatWithAgent } from './services/geminiService';
-import { 
-  Sparkles, Layout, Download, Settings, Moon, Sun, ArrowDown, ArrowRight, 
-  PlusCircle, Undo2, Redo2, Copy, Menu, X, Trash2, Plus, FileText, Edit2, Clipboard,
-  Bot, Image as ImageIcon, FileJson, Palette
+import { generateBrainstormIdeas } from './services/geminiService';
+import { useCanvasManager } from '@/hooks/useCanvasManager';
+import { useHistoryManager } from '@/hooks/useHistoryManager';
+import { useAgentInterface } from '@/hooks/useAgentInterface';
+import {
+  Sparkles,
+  Download,
+  Settings,
+  Moon,
+  Sun,
+  ArrowDown,
+  ArrowRight,
+  Undo2,
+  Redo2,
+  Menu,
+  Plus,
+  Clipboard,
+  Bot,
+  Image as ImageIcon,
+  FileJson,
 } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 export default function App() {
   const t = LABELS;
 
-  // --- Canvas State ---
-  const [canvases, setCanvases] = useState<Canvas[]>([{
-    id: 'default-canvas',
-    name: t.untitledCanvas,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    data: INITIAL_DATA
-  }]);
-  const [currentCanvasId, setCurrentCanvasId] = useState<string>('default-canvas');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const {
+    canvases,
+    currentCanvasId,
+    currentCanvas,
+    isSidebarOpen,
+    openSidebar,
+    closeSidebar,
+    toggleSidebar,
+    editingCanvasId,
+    tempCanvasName,
+    setTempCanvasName,
+    startRename,
+    saveRename,
+    createCanvas,
+    selectCanvas,
+    deleteCanvas,
+    updateCanvasData,
+  } = useCanvasManager({ initialData: INITIAL_DATA, labels: LABELS });
 
-  // --- History ---
-  const [history, setHistory] = useState<MindMapProject[]>([INITIAL_DATA]);
-  const [historyIndex, setHistoryIndex] = useState(0);
+  const {
+    data,
+    pushState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    historyIndex,
+    load: loadHistory,
+    updateCurrent,
+  } = useHistoryManager({
+    initialData: INITIAL_DATA,
+    onChange: (project) => updateCanvasData(currentCanvasId, project),
+  });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
@@ -57,53 +91,20 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   
-  const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
-  const [tempCanvasName, setTempCanvasName] = useState("");
-
-  // --- Agent State ---
-  const [isAgentOpen, setIsAgentOpen] = useState(false); // Default closed in this UI
-  const [agentPanelWidth, setAgentPanelWidth] = useState(350);
-  const [isResizingAgent, setIsResizingAgent] = useState(false);
-  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([]);
-  const [isAgentProcessing, setIsAgentProcessing] = useState(false);
+  const {
+    isAgentOpen,
+    toggleAgent,
+    closeAgent,
+    agentPanelWidth,
+    startResizing,
+    messages: agentMessages,
+    isAgentProcessing,
+    sendMessage: sendAgentMessage,
+    availableNodes,
+  } = useAgentInterface({ data, pushState });
   
   const exportRef = useRef<HTMLDivElement>(null);
   
-  const data = history[historyIndex] || INITIAL_DATA;
-
-  const updateCurrentCanvasData = useCallback((newData: MindMapProject) => {
-      setCanvases(prev => prev.map(c => 
-          c.id === currentCanvasId 
-              ? { ...c, data: newData, updatedAt: Date.now() }
-              : c
-      ));
-  }, [currentCanvasId]);
-
-  const pushState = useCallback((newData: MindMapProject) => {
-    setHistory(prev => {
-        const newHistory = prev.slice(0, historyIndex + 1);
-        return [...newHistory, newData];
-    });
-    setHistoryIndex(prev => prev + 1);
-    updateCurrentCanvasData(newData);
-  }, [historyIndex, updateCurrentCanvasData]);
-
-  const undo = useCallback(() => {
-    if (historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        setHistoryIndex(newIndex);
-        updateCurrentCanvasData(history[newIndex]);
-    }
-  }, [historyIndex, history, updateCurrentCanvasData]);
-
-  const redo = useCallback(() => {
-    if (historyIndex < history.length - 1) {
-        const newIndex = historyIndex + 1;
-        setHistoryIndex(newIndex);
-        updateCurrentCanvasData(history[newIndex]);
-    }
-  }, [historyIndex, history.length, history, updateCurrentCanvasData]);
-
   const getNextLogicalType = (parentType: NodeType): NodeType => {
       switch (parentType) {
           case NodeType.TOPIC: return NodeType.PROBLEM;
@@ -168,23 +169,12 @@ export default function App() {
       }
   }, [data, handleTypeChange]);
 
-  const handleMoveRoot = useCallback((id: string, x: number, y: number) => {
-      setHistory(prev => {
-          const currentHistory = [...prev];
-          const currentData = currentHistory[historyIndex];
-          if (currentData) {
-             currentHistory[historyIndex] = updateRootPosition(currentData, id, x, y); 
-          }
-          return currentHistory;
-      });
-      setCanvases(prev => prev.map(c => {
-          if (c.id === currentCanvasId) {
-               const currentData = history[historyIndex];
-               if (currentData) return { ...c, data: updateRootPosition(currentData, id, x, y) };
-          }
-          return c;
-      }));
-  }, [historyIndex, currentCanvasId, history]);
+  const handleMoveRoot = useCallback(
+    (id: string, x: number, y: number) => {
+      updateCurrent((project) => updateRootPosition(project, id, x, y));
+    },
+    [updateCurrent]
+  );
 
   const handleCopyContext = useCallback((id: string) => {
       // Use JSON format
@@ -298,108 +288,41 @@ export default function App() {
     }
   }, [data, t, pushState]);
 
-  const handleAgentMessage = useCallback(async (text: string) => {
-    const newMessage: AgentMessage = { id: generateNodeId(), role: 'user', content: text, timestamp: Date.now() };
-    setAgentMessages(prev => [...prev, newMessage]);
-    setIsAgentProcessing(true);
-    try {
-        const flattenedContext = serializeForestForAgent(data);
-        const response = await chatWithAgent(text, flattenedContext);
-        if (response.operations && response.operations.length > 0) {
-            let currentData = data;
-            let changesMade = false;
-            for (const op of response.operations) {
-                if (op.action === 'ADD_CHILD' && op.parentId && op.nodeType && op.content) {
-                     const newChild: MindMapNode = {
-                        id: generateNodeId(), type: op.nodeType as NodeType, content: op.content, children: [], parentId: op.parentId
-                    };
-                    currentData = addNode(currentData, newChild);
-                    changesMade = true;
-                } else if (op.action === 'UPDATE_CONTENT' && op.nodeId && op.content) {
-                    currentData = updateNode(currentData, op.nodeId, () => ({ content: op.content! }));
-                    changesMade = true;
-                } else if (op.action === 'DELETE_NODE' && op.nodeId) {
-                    currentData = deleteNode(currentData, op.nodeId);
-                    changesMade = true;
-                }
-            }
-            if (changesMade) pushState(currentData);
-        }
-        setAgentMessages(prev => [...prev, { id: generateNodeId(), role: 'assistant', content: response.reply, timestamp: Date.now() }]);
-    } catch (error) {
-        setAgentMessages(prev => [...prev, { id: generateNodeId(), role: 'assistant', content: "Error processing request.", timestamp: Date.now() }]);
-    } finally {
-        setIsAgentProcessing(false);
-    }
-  }, [data, pushState]);
+  const handleCreateCanvas = useCallback(() => {
+    const nextData = createCanvas();
+    loadHistory(nextData);
+    setSelectedId(null);
+    setEditingNodeId(null);
+  }, [createCanvas, loadHistory]);
 
-  const handleCreateCanvas = () => {
-      const rootId = generateNodeId();
-      const newCanvas: Canvas = {
-          id: `canvas_${Date.now()}`, name: t.untitledCanvas + ' ' + (canvases.length + 1), createdAt: Date.now(), updatedAt: Date.now(),
-          data: { nodes: { [rootId]: { id: rootId, type: NodeType.TOPIC, content: t.newIdea, children: [], parentId: null, x: 0, y: 0 } }, rootIds: [rootId] }
-      };
-      setCanvases(prev => [...prev, newCanvas]);
-      handleSwitchCanvas(newCanvas.id, newCanvas.data);
-      setIsSidebarOpen(false);
-  };
+  const handleSwitchCanvas = useCallback(
+    (id: string) => {
+      const loaded = selectCanvas(id);
+      if (loaded) {
+        loadHistory(loaded);
+        setSelectedId(null);
+        setEditingNodeId(null);
+      }
+    },
+    [selectCanvas, loadHistory]
+  );
 
-  const handleSwitchCanvas = (id: string, canvasData?: MindMapProject) => {
-      const targetCanvas = canvases.find(c => c.id === id);
-      if (!targetCanvas && !canvasData) return;
-      const dataToLoad = canvasData || targetCanvas!.data;
-      setCurrentCanvasId(id);
-      setHistory([dataToLoad]);
-      setHistoryIndex(0);
-      setSelectedId(null);
-      setEditingNodeId(null);
-      setIsSidebarOpen(false);
-  };
-
-  const handleDeleteCanvas = (e: React.MouseEvent, id: string) => {
-      e.stopPropagation();
+  const handleDeleteCanvas = useCallback(
+    (id: string) => {
       if (canvases.length <= 1 || !window.confirm(t.confirmDelete)) return;
-      const newCanvases = canvases.filter(c => c.id !== id);
-      setCanvases(newCanvases);
-      if (id === currentCanvasId) handleSwitchCanvas(newCanvases[0].id, newCanvases[0].data);
-  };
-
-  const handleStartRename = (e: React.MouseEvent, canvas: Canvas) => {
-      e.stopPropagation();
-      setEditingCanvasId(canvas.id);
-      setTempCanvasName(canvas.name);
-  };
-
-  const handleSaveRename = (id: string) => {
-      setCanvases(prev => prev.map(c => c.id === id ? { ...c, name: tempCanvasName } : c));
-      setEditingCanvasId(null);
-  };
+      const loaded = deleteCanvas(id);
+      if (loaded) {
+        loadHistory(loaded);
+        setSelectedId(null);
+        setEditingNodeId(null);
+      }
+    },
+    [canvases.length, deleteCanvas, loadHistory, t.confirmDelete]
+  );
 
   const toggleSetting = (key: keyof ViewSettings, value: any) => {
     setViewSettings(prev => ({ ...prev, [key]: value }));
   };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isResizingAgent) {
-        const newWidth = Math.max(250, Math.min(e.clientX, 600));
-        setAgentPanelWidth(newWidth);
-      }
-    };
-    const handleMouseUp = () => { if (isResizingAgent) setIsResizingAgent(false); };
-    if (isResizingAgent) {
-      document.body.style.cursor = 'col-resize';
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    } else {
-      document.body.style.cursor = 'default';
-    }
-    return () => {
-      document.body.style.cursor = 'default';
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizingAgent]);
 
   useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -416,9 +339,6 @@ export default function App() {
       return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedId, editingNodeId, editingCanvasId, handleAddChild, handleAddSibling, handleDelete, undo, redo, handleCycleType]);
 
-  const sidebarBg = viewSettings.theme === 'dark' ? 'bg-[#18181b] border-r border-neutral-800' : 'bg-neutral-50 border-r border-neutral-200';
-  const currentCanvas = canvases.find(c => c.id === currentCanvasId);
-
   // Floating Control Styles
   const topBtnClass = "w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg border";
   const topBtnDark = "bg-[#18181b] hover:bg-neutral-800 text-neutral-300 border-neutral-800";
@@ -428,33 +348,22 @@ export default function App() {
   return (
     <div className={`w-full h-screen flex overflow-hidden relative ${viewSettings.theme === 'dark' ? 'bg-[#09090b]' : 'bg-white'}`}>
       
-      {/* Left Canvas Drawer */}
-      <div className={`fixed inset-y-0 left-0 z-[100] w-64 transform transition-transform duration-300 ease-in-out ${sidebarBg} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col`}>
-          <div className={`h-14 flex items-center justify-between px-4 border-b ${viewSettings.theme === 'dark' ? 'border-neutral-800' : 'border-neutral-200'}`}>
-              <h2 className="text-xs font-bold uppercase tracking-wider opacity-70">{t.myCanvases}</h2>
-              <button onClick={() => setIsSidebarOpen(false)} className={`p-1 rounded hover:bg-white/10`}><X size={16} /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {canvases.map(canvas => (
-                  <div key={canvas.id} onClick={() => handleSwitchCanvas(canvas.id)} className={`flex items-center justify-between p-2 cursor-pointer rounded transition-colors ${currentCanvasId === canvas.id ? (viewSettings.theme === 'dark' ? 'bg-neutral-800 text-white' : 'bg-white border border-neutral-200') : 'opacity-70 hover:opacity-100'}`}>
-                      <div className="flex items-center gap-2 overflow-hidden">
-                          <FileText size={14} />
-                          {editingCanvasId === canvas.id ? (
-                              <input autoFocus value={tempCanvasName} onChange={(e) => setTempCanvasName(e.target.value)} onBlur={() => handleSaveRename(canvas.id)} onKeyDown={(e) => e.key === 'Enter' && handleSaveRename(canvas.id)} onClick={(e) => e.stopPropagation()} className="bg-transparent border-b outline-none text-xs w-full" />
-                          ) : <span className="text-xs truncate select-none">{canvas.name}</span>}
-                      </div>
-                      <div className="flex items-center gap-1">
-                          <button onClick={(e) => handleStartRename(e, canvas)} className="p-1 hover:text-blue-500"><Edit2 size={10} /></button>
-                          {canvases.length > 1 && <button onClick={(e) => handleDeleteCanvas(e, canvas.id)} className="p-1 hover:text-red-500"><Trash2 size={10} /></button>}
-                      </div>
-                  </div>
-              ))}
-          </div>
-          <div className={`p-4 border-t ${viewSettings.theme === 'dark' ? 'border-neutral-800' : 'border-neutral-200'}`}>
-              <button onClick={handleCreateCanvas} className={`w-full flex items-center justify-center gap-2 py-2 text-xs font-bold uppercase border transition-colors ${viewSettings.theme === 'dark' ? 'border-neutral-700 hover:bg-neutral-800' : 'border-neutral-300 hover:bg-neutral-100'}`}><Plus size={14} /> {t.newCanvas}</button>
-          </div>
-      </div>
-      {isSidebarOpen && <div className="fixed inset-0 bg-black/50 z-[90]" onClick={() => setIsSidebarOpen(false)} />}
+      <CanvasDrawer
+        canvases={canvases}
+        currentCanvasId={currentCanvasId}
+        viewSettings={viewSettings}
+        isOpen={isSidebarOpen}
+        labels={t}
+        editingCanvasId={editingCanvasId}
+        tempCanvasName={tempCanvasName}
+        onTempCanvasNameChange={setTempCanvasName}
+        onSelectCanvas={handleSwitchCanvas}
+        onCreateCanvas={handleCreateCanvas}
+        onDeleteCanvas={handleDeleteCanvas}
+        onStartRename={startRename}
+        onSaveRename={saveRename}
+        onClose={closeSidebar}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
@@ -476,7 +385,7 @@ export default function App() {
             {/* Top Left: Menu & Title */}
             <div className="absolute top-6 left-6 flex items-center gap-3 pointer-events-auto">
                 <button 
-                   onClick={() => setIsSidebarOpen(true)} 
+                   onClick={openSidebar} 
                    className={`${topBtnStyle} rounded-full`}
                 >
                     <Menu size={18} />
@@ -488,14 +397,14 @@ export default function App() {
                          <span className="font-bold tracking-tight text-sm">Vibe-Thinking</span>
                     </div>
                     <div className="h-4 w-px bg-neutral-700/50 mx-1"></div>
-                    <div className="min-w-[80px]" onDoubleClick={(e) => currentCanvas && handleStartRename(e, currentCanvas)}>
+                    <div className="min-w-[80px]" onDoubleClick={() => currentCanvas && startRename(currentCanvas.id)}>
                         {editingCanvasId === currentCanvasId ? (
                         <input 
                             autoFocus 
                             value={tempCanvasName} 
                             onChange={(e) => setTempCanvasName(e.target.value)} 
-                            onBlur={() => handleSaveRename(currentCanvasId)} 
-                            onKeyDown={(e) => e.key === 'Enter' && handleSaveRename(currentCanvasId)} 
+                            onBlur={() => saveRename(currentCanvasId)} 
+                            onKeyDown={(e) => e.key === 'Enter' && saveRename(currentCanvasId)} 
                             className="bg-transparent border-b outline-none text-xs font-mono w-full"
                         />
                         ) : (
@@ -507,10 +416,10 @@ export default function App() {
 
             {/* Top Right: Actions */}
             <div className="absolute top-6 right-6 flex items-center gap-3 pointer-events-auto">
-                 <button onClick={undo} disabled={historyIndex === 0} className={`${topBtnStyle} ${historyIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                 <button onClick={undo} disabled={!canUndo} className={`${topBtnStyle} ${!canUndo ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <Undo2 size={16} />
                  </button>
-                 <button onClick={redo} disabled={historyIndex === history.length - 1} className={`${topBtnStyle} ${historyIndex === history.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                 <button onClick={redo} disabled={!canRedo} className={`${topBtnStyle} ${!canRedo ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <Redo2 size={16} />
                  </button>
                  
@@ -540,7 +449,7 @@ export default function App() {
                  </button>
 
                  {/* Theme/Agent Toggle (Purple Button) */}
-                 <button onClick={() => setIsAgentOpen(!isAgentOpen)} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white`}>
+                 <button onClick={toggleAgent} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white`}>
                     <Bot size={18} />
                  </button>
             </div>
@@ -586,17 +495,17 @@ export default function App() {
           >
              <AgentPanel 
                 isOpen={isAgentOpen}
-                onClose={() => setIsAgentOpen(false)}
+                onClose={closeAgent}
                 messages={agentMessages}
-                onSendMessage={handleAgentMessage}
+                onSendMessage={sendAgentMessage}
                 isProcessing={isAgentProcessing}
                 theme={viewSettings.theme}
-                availableNodes={serializeForestForAgent(data)}
+                availableNodes={availableNodes}
             />
             {/* Draggable Handle */}
             <div 
                 className="absolute top-0 left-[-4px] bottom-0 w-[8px] cursor-col-resize z-50 hover:bg-blue-500/20 transition-colors flex items-center justify-center group"
-                onMouseDown={(e) => { e.preventDefault(); setIsResizingAgent(true); }}
+                onMouseDown={(e) => { e.preventDefault(); startResizing(); }}
             >
                <div className={`h-8 w-1 rounded-full bg-neutral-600 group-hover:bg-blue-500 transition-colors`} />
             </div>
