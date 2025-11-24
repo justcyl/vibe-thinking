@@ -4,7 +4,12 @@
 主入口 `index.tsx` -> `App.tsx` 装载思维白板与 Agent 侧栏。复用组件位于 `components/`（`Whiteboard.tsx`, `NodeItem.tsx`, `AgentPanel.tsx`），配合 `types.ts` 中的 `MindMapProject`、`NodeType` 模型和 `constants.ts` 的标签/提示。布局与历史栈操作集中在 `utils/layout.ts`，所有 Gemini 交互实现在 `services/geminiService.ts` 并读取 `process.env.API_KEY`。`vite.config.ts` 定义构建入口，`index.html` 提供静态骨架，AI Studio 关联信息位于 `metadata.json`。
 
 ## 构建、测试与开发命令 Build & Dev Commands
-使用 Node 18+。建议以仓库名+分支命名 tmux 会话：`SESSION=vibe-thinking-$(git rev-parse --abbrev-ref HEAD | tr '/' '-') && tmux new -As \"$SESSION\" 'npm run dev'`，不同仓库/分支会落在不同会话；重新附加执行 `tmux attach -t \"$SESSION\"`。
+使用 Node 18+。在 Codex CLI 中运行项目时，请一律通过 tmux 启动并用非交互方式查看日志：
+1. `SESSION=vibe-thinking-$(git rev-parse --abbrev-ref HEAD | tr '/' '-')`。
+2. `tmux has-session -t "$SESSION" || tmux new-session -d -s "$SESSION" 'npm run dev'`（避免重复创建出错）。
+3. 通过 `tmux capture-pane -t "$SESSION" -p` 查看输出；结束服务用 `tmux kill-session -t "$SESSION"`。
+
+不同仓库/分支各用独立 SESSION，重复使用时保持相同命名即可。
 
 
 ## 代码风格与命名 Coding Style
