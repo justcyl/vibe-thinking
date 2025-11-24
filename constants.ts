@@ -1,0 +1,247 @@
+
+import { NodeType, MindMapProject } from './types';
+import { Lightbulb, Search, Box, AlertCircle, Play, Paperclip, AtSign, File, GripVertical } from 'lucide-react';
+
+// Minimalist Dark Theme with Colored Headers - Updated for vibrancy
+const DARK_COLORS = {
+  [NodeType.TOPIC]: {
+    bg: 'bg-[#18181b]', // zinc-950/black
+    border: 'border-purple-500/30',
+    text: 'text-neutral-200',
+    headerBg: 'bg-[#7c3aed]', // violet-600
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-[#7c3aed]',
+  },
+  [NodeType.PROBLEM]: {
+    bg: 'bg-[#18181b]',
+    border: 'border-orange-500/30',
+    text: 'text-neutral-200',
+    headerBg: 'bg-[#ea580c]', // orange-600
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-[#ea580c]',
+  },
+  [NodeType.HYPOTHESIS]: {
+    bg: 'bg-[#18181b]',
+    border: 'border-sky-500/30',
+    text: 'text-neutral-200',
+    headerBg: 'bg-[#0ea5e9]', // sky-500
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-[#0ea5e9]',
+  },
+  [NodeType.ACTION]: {
+    bg: 'bg-[#18181b]',
+    border: 'border-rose-500/30',
+    text: 'text-neutral-200',
+    headerBg: 'bg-[#e11d48]', // rose-600
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-[#e11d48]',
+  },
+  [NodeType.EVIDENCE]: {
+    bg: 'bg-[#18181b]',
+    border: 'border-emerald-500/30',
+    text: 'text-neutral-200',
+    headerBg: 'bg-[#059669]', // emerald-600
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-[#059669]',
+  },
+};
+
+// Minimalist Light Theme with Colored Headers
+const LIGHT_COLORS = {
+  [NodeType.TOPIC]: {
+    bg: 'bg-white',
+    border: 'border-purple-200',
+    text: 'text-black',
+    headerBg: 'bg-purple-600',
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-purple-600',
+  },
+  [NodeType.PROBLEM]: {
+    bg: 'bg-white',
+    border: 'border-orange-200',
+    text: 'text-black',
+    headerBg: 'bg-orange-600',
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-orange-600',
+  },
+  [NodeType.HYPOTHESIS]: {
+    bg: 'bg-white',
+    border: 'border-sky-200',
+    text: 'text-black',
+    headerBg: 'bg-sky-600',
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-sky-600',
+  },
+  [NodeType.ACTION]: {
+    bg: 'bg-white',
+    border: 'border-rose-200',
+    text: 'text-black',
+    headerBg: 'bg-rose-600',
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-rose-600',
+  },
+  [NodeType.EVIDENCE]: {
+    bg: 'bg-white',
+    border: 'border-emerald-200',
+    text: 'text-black',
+    headerBg: 'bg-emerald-600',
+    headerText: 'text-white',
+    icon: 'text-white',
+    indicator: 'bg-emerald-600',
+  },
+};
+
+export const THEME_COLORS = {
+  dark: DARK_COLORS,
+  light: LIGHT_COLORS,
+};
+
+export const NODE_ICONS = {
+  [NodeType.TOPIC]: Box,
+  [NodeType.PROBLEM]: AlertCircle,
+  [NodeType.HYPOTHESIS]: Lightbulb,
+  [NodeType.ACTION]: Play,
+  [NodeType.EVIDENCE]: Search,
+};
+
+export const TYPE_DESCRIPTIONS = {
+  [NodeType.TOPIC]: {
+    label: "TOPIC (主题)",
+    syntax: "陈述句",
+    definition: "思考的边界与上下文。你承诺要专注的范围。",
+    example: "用户登录模块重构"
+  },
+  [NodeType.PROBLEM]: {
+    label: "PROBLEM (难题/挑战)",
+    syntax: "问句 (How/Why) 或 负面陈述",
+    definition: "推进过程中的阻碍（Current Blocker）或预判风险（Future Risk）。",
+    example: "如何在大流量下保证数据一致性？"
+  },
+  [NodeType.HYPOTHESIS]: {
+    label: "HYPOTHESIS (假说/设想)",
+    syntax: "陈述句 (断言/判断)",
+    definition: "对 PROBLEM 的主观解答。脑海中的模拟运行，待验证。",
+    example: "使用 Redis 分布式锁可以解决一致性问题。"
+  },
+  [NodeType.ACTION]: {
+    label: "ACTION (行动/实验)",
+    syntax: "祈使句 (动宾结构)",
+    definition: "为验证 HYPOTHESIS 必须执行的动作。必须产出 Evidence。",
+    example: "编写一个并发测试脚本模拟抢单。"
+  },
+  [NodeType.EVIDENCE]: {
+    label: "EVIDENCE (事实/证据)",
+    syntax: "陈述句 (客观结果)",
+    definition: "执行 ACTION 后的客观结果。用于证实或证伪 HYPOTHESIS。",
+    example: "脚本运行后，有 0.5% 的订单出现了超卖。"
+  }
+};
+
+// Normalized Initial Data
+export const INITIAL_DATA: MindMapProject = {
+  nodes: {
+    'root_1': {
+      id: 'root_1',
+      type: NodeType.TOPIC,
+      content: '如何减少城市中的塑料垃圾？',
+      children: ['child_1', 'child_2'],
+      parentId: null,
+      x: 0,
+      y: 0
+    },
+    'child_1': {
+      id: 'child_1',
+      type: NodeType.PROBLEM,
+      content: '大部分垃圾来自一次性包装，回收成本过高。',
+      children: ['sub_1'],
+      parentId: 'root_1'
+    },
+    'sub_1': {
+      id: 'sub_1',
+      type: NodeType.HYPOTHESIS,
+      content: '对一次性塑料征收环保税可以降低使用量。',
+      children: ['action_1'],
+      parentId: 'child_1'
+    },
+    'action_1': {
+      id: 'action_1',
+      type: NodeType.ACTION,
+      content: '调研爱尔兰塑料袋税实施后的数据变化。',
+      children: [],
+      parentId: 'sub_1'
+    },
+    'child_2': {
+      id: 'child_2',
+      type: NodeType.PROBLEM,
+      content: '居民垃圾分类标准混乱，导致回收率低。',
+      children: [],
+      parentId: 'root_1'
+    }
+  },
+  rootIds: ['root_1']
+};
+
+// Fixed dimensions for compact view
+export const NODE_WIDTH = 260; 
+export const NODE_HEIGHT = 100; 
+
+export const LABELS = {
+  appTitle: "Vibe-Thinking",
+  aiPowered: "AI 驱动",
+  viewSettings: "视图设置",
+  theme: "主题",
+  dark: "深色",
+  light: "浅色",
+  orientation: "排列方向",
+  vertical: "纵向",
+  horizontal: "横向",
+  export: "导出",
+  exportJson: "导出 JSON",
+  exportImage: "导出图片 (PNG)",
+  nodeProperties: "节点属性",
+  type: "类型",
+  actions: "操作",
+  brainstormAI: "AI 头脑风暴",
+  thinking: "思考中...",
+  deleteNode: "删除节点",
+  cannotDeleteRoot: "无法直接删除根节点。请删除整棵树或清空内容。",
+  newIdea: "新节点...",
+  floatingNode: "添加游离节点",
+  addFloating: "添加节点",
+  resetView: "重置",
+  noIdeas: "未生成想法，请尝试理清父节点内容。",
+  failedConnect: "连接 Gemini 失败。",
+  undo: "撤销",
+  redo: "重做",
+  copyContext: "复制上下文",
+  contextCopied: "上下文已复制到剪贴板",
+  copyGlobal: "复制全局上下文",
+  globalCopied: "全局思维导图已复制",
+  pressTab: "按 Tab 切换类型",
+  myCanvases: "我的画布",
+  newCanvas: "新建画布",
+  untitledCanvas: "无标题画布",
+  deleteCanvas: "删除",
+  renameCanvas: "重命名",
+  confirmDelete: "确认删除画布？",
+  agentTitle: "思维助理",
+  agentWelcome: "我是您的思维助理。输入指令或使用 @ 引用节点。",
+  agentPlaceholder: "输入指令 / 使用 @ 引用节点...",
+  agentSending: "正在处理...",
+};
+
+export const AGENT_ICONS = {
+    Paperclip,
+    AtSign,
+    File,
+    GripVertical
+};
