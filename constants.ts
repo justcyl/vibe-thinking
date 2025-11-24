@@ -149,45 +149,45 @@ export const TYPE_DESCRIPTIONS = {
 // Normalized Initial Data
 export const INITIAL_DATA: MindMapProject = {
   nodes: {
-    'root_1': {
-      id: 'root_1',
+    A1B2C3: {
+      id: 'A1B2C3',
       type: NodeType.TOPIC,
       content: '如何减少城市中的塑料垃圾？',
-      children: ['child_1', 'child_2'],
+      children: ['D4E5F6', 'G7H8I9'],
       parentId: null,
       x: 0,
       y: 0
     },
-    'child_1': {
-      id: 'child_1',
+    D4E5F6: {
+      id: 'D4E5F6',
       type: NodeType.PROBLEM,
       content: '大部分垃圾来自一次性包装，回收成本过高。',
-      children: ['sub_1'],
-      parentId: 'root_1'
+      children: ['J1K2L3'],
+      parentId: 'A1B2C3'
     },
-    'sub_1': {
-      id: 'sub_1',
+    J1K2L3: {
+      id: 'J1K2L3',
       type: NodeType.HYPOTHESIS,
       content: '对一次性塑料征收环保税可以降低使用量。',
-      children: ['action_1'],
-      parentId: 'child_1'
+      children: ['M4N5O6'],
+      parentId: 'D4E5F6'
     },
-    'action_1': {
-      id: 'action_1',
+    M4N5O6: {
+      id: 'M4N5O6',
       type: NodeType.ACTION,
       content: '调研爱尔兰塑料袋税实施后的数据变化。',
       children: [],
-      parentId: 'sub_1'
+      parentId: 'J1K2L3'
     },
-    'child_2': {
-      id: 'child_2',
+    G7H8I9: {
+      id: 'G7H8I9',
       type: NodeType.PROBLEM,
       content: '居民垃圾分类标准混乱，导致回收率低。',
       children: [],
-      parentId: 'root_1'
+      parentId: 'A1B2C3'
     }
   },
-  rootIds: ['root_1']
+  rootIds: ['A1B2C3']
 };
 
 // Fixed dimensions for compact view

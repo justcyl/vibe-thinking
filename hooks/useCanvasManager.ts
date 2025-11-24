@@ -70,8 +70,16 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     [canvases, currentCanvasId]
   );
 
+  const getGlobalNodeIds = useCallback(() => {
+    const ids = new Set<string>();
+    canvases.forEach((canvas) => {
+      Object.keys(canvas.data.nodes).forEach((nodeId) => ids.add(nodeId));
+    });
+    return ids;
+  }, [canvases]);
+
   const createCanvas = useCallback(() => {
-    const rootId = generateNodeId();
+    const rootId = generateNodeId(getGlobalNodeIds());
     const data: MindMapProject = {
       nodes: {
         [rootId]: {
@@ -98,7 +106,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     setEditingCanvasId(null);
     setIsSidebarOpen(false);
     return data;
-  }, [canvases.length, labels.newIdea, labels.untitledCanvas]);
+  }, [canvases.length, labels.newIdea, labels.untitledCanvas, getGlobalNodeIds]);
 
   const deleteCanvas = useCallback(
     (id: string) => {

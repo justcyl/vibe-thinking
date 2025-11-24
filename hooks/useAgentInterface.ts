@@ -6,6 +6,7 @@ import { addNode, deleteNode, generateNodeId, serializeForestForAgent, updateNod
 interface UseAgentInterfaceOptions {
   data: MindMapProject;
   pushState: (project: MindMapProject) => void;
+  getGlobalNodeIds: () => Set<string>;
 }
 
 interface AgentInterface {
@@ -20,10 +21,14 @@ interface AgentInterface {
   availableNodes: { id: string; parentId: string | null; type: NodeType; content: string }[];
 }
 
-const applyOperation = (project: MindMapProject, operation: AgentOperation): { next: MindMapProject; changed: boolean } => {
+const applyOperation = (
+  project: MindMapProject,
+  operation: AgentOperation,
+  usedIds?: Set<string>
+): { next: MindMapProject; changed: boolean } => {
   if (operation.action === 'ADD_CHILD' && operation.parentId && operation.nodeType && operation.content) {
     const newChild: MindMapNode = {
-      id: generateNodeId(),
+      id: generateNodeId(usedIds),
       type: operation.nodeType,
       content: operation.content,
       children: [],
@@ -49,7 +54,7 @@ const applyOperation = (project: MindMapProject, operation: AgentOperation): { n
 /**
  * 将 Agent 交互、拖拽宽度等状态集中在一个 Hook 中，方便团队独立维护 Agent 功能。
  */
-export const useAgentInterface = ({ data, pushState }: UseAgentInterfaceOptions): AgentInterface => {
+export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgentInterfaceOptions): AgentInterface => {
   const [isAgentOpen, setIsAgentOpen] = useState(false);
   const [agentPanelWidth, setAgentPanelWidth] = useState(350);
   const [isResizingAgent, setIsResizingAgent] = useState(false);
@@ -104,8 +109,9 @@ export const useAgentInterface = ({ data, pushState }: UseAgentInterfaceOptions)
         if (response.operations && response.operations.length > 0) {
           let nextProject = data;
           let changed = false;
+          const usedIds = getGlobalNodeIds();
           response.operations.forEach((operation) => {
-            const result = applyOperation(nextProject, operation);
+            const result = applyOperation(nextProject, operation, usedIds);
             nextProject = result.next;
             changed = changed || result.changed;
           });
@@ -134,7 +140,7 @@ export const useAgentInterface = ({ data, pushState }: UseAgentInterfaceOptions)
         setIsAgentProcessing(false);
       }
     },
-    [availableNodes, data, pushState]
+    [availableNodes, data, pushState, getGlobalNodeIds]
   );
 
   return {

@@ -5,6 +5,7 @@ import {
   getFormattedGlobalContextString,
   getLayoutBounds,
   serializeForestForAgent,
+  serializeProjectForExport,
   updateNode
 } from '@/utils/layout';
 import { NODE_HEIGHT, NODE_WIDTH } from '@/constants';
@@ -120,6 +121,20 @@ describe('layout path helpers', () => {
 });
 
 describe('layout utilities', () => {
+  it('导出项目时遵循节点映射结构', () => {
+    const project = createProject();
+    const snapshot = serializeProjectForExport(project);
+
+    expect(snapshot.rootIds).toEqual(project.rootIds);
+    expect(snapshot.nodes.root).toEqual({
+      id: 'root',
+      type: NodeType.TOPIC,
+      content: '主议题',
+      children: ['child_action', 'child_evidence']
+    });
+    expect((snapshot.nodes.root as any).parentId).toBeUndefined();
+  });
+
   it('根据节点坐标计算导出边界', () => {
     const project = createProject();
     const nodes: LayoutNode[] = [

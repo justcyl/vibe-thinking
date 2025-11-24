@@ -18,6 +18,7 @@ import {
   getContextJsonString,
   getLayoutBounds,
   calculateTreeLayout,
+  serializeProjectForExport,
 } from './utils/layout';
 import { generateBrainstormIdeas } from './services/geminiService';
 import { useCanvasManager } from '@/hooks/useCanvasManager';
@@ -91,6 +92,15 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   
+  const exportRef = useRef<HTMLDivElement>(null);
+  const getGlobalNodeIds = useCallback(() => {
+    const ids = new Set<string>();
+    canvases.forEach((canvas) => {
+      Object.keys(canvas.data.nodes).forEach((id) => ids.add(id));
+    });
+    return ids;
+  }, [canvases]);
+
   const {
     isAgentOpen,
     toggleAgent,
@@ -101,9 +111,7 @@ export default function App() {
     isAgentProcessing,
     sendMessage: sendAgentMessage,
     availableNodes,
-  } = useAgentInterface({ data, pushState });
-  
-  const exportRef = useRef<HTMLDivElement>(null);
+  } = useAgentInterface({ data, pushState, getGlobalNodeIds });
   
   const getNextLogicalType = (parentType: NodeType): NodeType => {
       switch (parentType) {
@@ -120,22 +128,24 @@ export default function App() {
     const parentNode = data.nodes[parentId];
     if (!parentNode) return;
     const nextType = getNextLogicalType(parentNode.type);
+    const idRegistry = getGlobalNodeIds();
     const newChild: MindMapNode = {
-      id: generateNodeId(), type: nextType, content: t.newIdea, children: [], parentId: parentId
+      id: generateNodeId(idRegistry), type: nextType, content: t.newIdea, children: [], parentId: parentId
     };
     const newData = addNode(data, newChild);
     pushState(newData);
     setTimeout(() => { setSelectedId(newChild.id); setEditingNodeId(newChild.id); }, 0);
-  }, [data, t, pushState]);
+  }, [data, t, pushState, getGlobalNodeIds]);
 
   const handleAddFloatingNode = useCallback(() => {
+    const idRegistry = getGlobalNodeIds();
     const newNode: MindMapNode = {
-      id: generateNodeId(), type: NodeType.TOPIC, content: t.newIdea, children: [], parentId: null, x: 0, y: 0,
+      id: generateNodeId(idRegistry), type: NodeType.TOPIC, content: t.newIdea, children: [], parentId: null, x: 0, y: 0,
     };
     const newData = addNode(data, newNode);
     pushState(newData);
     setTimeout(() => { setSelectedId(newNode.id); setEditingNodeId(newNode.id); }, 0);
-  }, [data, t, pushState]);
+  }, [data, t, pushState, getGlobalNodeIds]);
 
   const handleAddSibling = useCallback((id: string) => {
       const parentId = getParentId(data, id);
@@ -199,7 +209,8 @@ export default function App() {
   }, [data, t]);
 
   const handleExportJson = useCallback(() => {
-     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+     const serialized = JSON.stringify(serializeProjectForExport(data), null, 2);
+     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(serialized);
      const downloadAnchorNode = document.createElement('a');
      downloadAnchorNode.setAttribute("href", dataStr);
      downloadAnchorNode.setAttribute("download", `${canvases.find(c => c.id === currentCanvasId)?.name || 'brainstorm'}.json`);
@@ -272,10 +283,11 @@ export default function App() {
           setNotification(t.noIdeas);
           setTimeout(() => setNotification(null), 3000);
       }
+      const idRegistry = getGlobalNodeIds();
       let currentProject = data;
       suggestions.forEach(suggestion => {
         const newChild: MindMapNode = {
-           id: generateNodeId(), type: suggestion.type, content: suggestion.content, children: [], parentId: nodeId
+           id: generateNodeId(idRegistry), type: suggestion.type, content: suggestion.content, children: [], parentId: nodeId
         };
         currentProject = addNode(currentProject, newChild);
       });
@@ -286,7 +298,7 @@ export default function App() {
     } finally {
       setIsGenerating(false);
     }
-  }, [data, t, pushState]);
+  }, [data, t, pushState, getGlobalNodeIds]);
 
   const handleCreateCanvas = useCallback(() => {
     const nextData = createCanvas();

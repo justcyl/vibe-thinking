@@ -26,6 +26,18 @@ export interface MindMapProject {
   rootIds: string[];
 }
 
+export interface MindMapSnapshotNode {
+  id: string;
+  type: NodeType;
+  content: string;
+  children: string[];
+}
+
+export interface MindMapSnapshot {
+  nodes: Record<string, MindMapSnapshotNode>;
+  rootIds: string[];
+}
+
 // Flattened node with layout coordinates (For Rendering)
 export interface LayoutNode {
   id: string;

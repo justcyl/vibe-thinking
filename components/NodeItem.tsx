@@ -56,6 +56,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   const toolbarBg = theme === 'dark' ? 'bg-[#09090b] border-neutral-800' : 'bg-white border-black';
   const toolbarHover = theme === 'dark' ? 'hover:bg-neutral-800' : 'hover:bg-neutral-100';
   const toolbarIcon = theme === 'dark' ? 'text-white' : 'text-black';
+  const nodeIdTextClass = theme === 'dark' ? 'text-white/70' : 'text-black/70';
 
   useEffect(() => {
     setTempContent(node.content);
@@ -146,24 +147,29 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         >
           <div className="flex items-center gap-2">
             <Icon size={12} strokeWidth={2.5} />
-            <span className={`text-[10px] font-bold uppercase tracking-wider`}>
+            <span className="text-[10px] font-bold uppercase tracking-wider">
               {node.type}
             </span>
           </div>
-          {isSelected && (
-             <button 
-               onClick={(e) => { 
-                   e.preventDefault(); 
-                   e.stopPropagation(); 
-                   onDelete(node.id); 
-               }}
-               onMouseDown={(e) => e.stopPropagation()}
-               className={`p-0.5 hover:bg-black/20 rounded transition-colors text-white cursor-pointer z-50`}
-               title="Delete Node"
-             >
-               <Trash2 size={12} />
-             </button>
-          )}
+          <div className="flex items-center gap-2">
+            <span className={`text-[10px] italic tracking-[0.18em] uppercase ${nodeIdTextClass}`}>
+              {node.id}
+            </span>
+            {isSelected && (
+               <button 
+                 onClick={(e) => { 
+                     e.preventDefault(); 
+                     e.stopPropagation(); 
+                     onDelete(node.id); 
+                 }}
+                 onMouseDown={(e) => e.stopPropagation()}
+                 className={`p-0.5 hover:bg-black/20 rounded transition-colors text-white cursor-pointer z-50`}
+                 title="Delete Node"
+               >
+                 <Trash2 size={12} />
+               </button>
+            )}
+          </div>
         </div>
 
         {/* Content Area */}

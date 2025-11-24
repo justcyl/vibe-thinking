@@ -1,11 +1,57 @@
 
 import * as d3 from 'd3-hierarchy';
-import { MindMapProject, MindMapNode, LayoutNode, LayoutLink, Orientation, NodeType } from '../types';
+import { MindMapProject, MindMapNode, LayoutNode, LayoutLink, Orientation, NodeType, MindMapSnapshot } from '../types';
 import { NODE_WIDTH, NODE_HEIGHT } from '../constants';
 
 // --- ID Generation ---
-export const generateNodeId = (): string => {
-  return `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+const NODE_ID_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const NODE_ID_DIGITS = '0123456789';
+const NODE_ID_CHARSET = `${NODE_ID_LETTERS}${NODE_ID_DIGITS}`;
+const NODE_ID_LENGTH = 6;
+const NODE_ID_MAX_ATTEMPTS = 1000;
+
+/**
+ * 生成随机 6 位节点 ID，保证在给定集合中唯一。
+ */
+export const generateNodeId = (existingIds?: Set<string> | string[]): string => {
+  const usedIds = existingIds instanceof Set ? existingIds : new Set(existingIds ?? []);
+  let attempt = 0;
+  let candidate = '';
+
+  const cryptoRef: Crypto | null =
+    typeof crypto !== 'undefined' && crypto?.getRandomValues ? crypto : null;
+
+  const getRandomIndex = (max: number): number => {
+    if (cryptoRef) {
+      const array = new Uint8Array(1);
+      let rand = 0;
+      do {
+        cryptoRef.getRandomValues(array);
+        rand = array[0];
+      } while (rand >= 256 - (256 % max));
+      return rand % max;
+    }
+    return Math.floor(Math.random() * max);
+  };
+
+  const createCandidate = () => {
+    const chars: string[] = [];
+    for (let i = 0; i < NODE_ID_LENGTH; i++) {
+      chars.push(NODE_ID_CHARSET[getRandomIndex(NODE_ID_CHARSET.length)]);
+    }
+    return chars.join('');
+  };
+
+  do {
+    if (attempt >= NODE_ID_MAX_ATTEMPTS) {
+      throw new Error('无法生成唯一节点 ID');
+    }
+    candidate = createCandidate();
+    attempt += 1;
+  } while (usedIds.has(candidate));
+
+  usedIds.add(candidate);
+  return candidate;
 };
 
 // --- D3 Integration ---
@@ -318,4 +364,24 @@ export const serializeForestForAgent = (project: MindMapProject) => {
         type: node.type,
         content: node.content
     }));
+};
+
+/**
+ * 导出保存时仅保留节点树必要字段。
+ */
+export const serializeProjectForExport = (project: MindMapProject): MindMapSnapshot => {
+  const nodes = Object.values(project.nodes).reduce<MindMapSnapshot['nodes']>((acc, node) => {
+    acc[node.id] = {
+      id: node.id,
+      type: node.type,
+      content: node.content,
+      children: [...node.children],
+    };
+    return acc;
+  }, {});
+
+  return {
+    nodes,
+    rootIds: [...project.rootIds],
+  };
 };
