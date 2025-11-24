@@ -1,0 +1,188 @@
+import { useCallback, useMemo, useState } from 'react';
+import { Canvas, MindMapProject, NodeType } from '@/types';
+import { LABELS } from '@/constants';
+import { generateNodeId } from '@/utils/layout';
+
+interface UseCanvasManagerOptions {
+  initialData: MindMapProject;
+  labels?: typeof LABELS;
+}
+
+interface CanvasManager {
+  canvases: Canvas[];
+  currentCanvasId: string;
+  currentCanvas?: Canvas;
+  isSidebarOpen: boolean;
+  editingCanvasId: string | null;
+  tempCanvasName: string;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+  toggleSidebar: () => void;
+  selectCanvas: (id: string) => MindMapProject | null;
+  createCanvas: () => MindMapProject;
+  deleteCanvas: (id: string) => MindMapProject | null;
+  startRename: (canvasId: string) => void;
+  saveRename: (canvasId: string) => void;
+  cancelRename: () => void;
+  setTempCanvasName: (value: string) => void;
+  updateCanvasData: (canvasId: string, project: MindMapProject) => void;
+}
+
+/**
+ * 统一管理画布列表、切换与重命名，以便画布相关开发可以独立进行。
+ */
+export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasManagerOptions): CanvasManager => {
+  const initialCanvas: Canvas = useMemo(
+    () => ({
+      id: 'default-canvas',
+      name: labels.untitledCanvas,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      data: initialData,
+    }),
+    [initialData, labels.untitledCanvas]
+  );
+
+  const [canvases, setCanvases] = useState<Canvas[]>([initialCanvas]);
+  const [currentCanvasId, setCurrentCanvasId] = useState(initialCanvas.id);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
+  const [tempCanvasName, setTempCanvasName] = useState('');
+
+  const currentCanvas = useMemo(() => canvases.find((canvas) => canvas.id === currentCanvasId), [canvases, currentCanvasId]);
+
+  const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
+  const toggleSidebar = useCallback(() => setIsSidebarOpen((prev) => !prev), []);
+
+  const selectCanvas = useCallback(
+    (id: string) => {
+      const target = canvases.find((canvas) => canvas.id === id);
+      if (!target) return null;
+      setIsSidebarOpen(false);
+      setEditingCanvasId(null);
+      if (target.id === currentCanvasId) {
+        return null;
+      }
+      setCurrentCanvasId(target.id);
+      return target.data;
+    },
+    [canvases, currentCanvasId]
+  );
+
+  const createCanvas = useCallback(() => {
+    const rootId = generateNodeId();
+    const data: MindMapProject = {
+      nodes: {
+        [rootId]: {
+          id: rootId,
+          type: NodeType.TOPIC,
+          content: labels.newIdea,
+          children: [],
+          parentId: null,
+          x: 0,
+          y: 0,
+        },
+      },
+      rootIds: [rootId],
+    };
+    const canvas: Canvas = {
+      id: `canvas_${Date.now()}`,
+      name: `${labels.untitledCanvas} ${canvases.length + 1}`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      data,
+    };
+    setCanvases((prev) => [...prev, canvas]);
+    setCurrentCanvasId(canvas.id);
+    setEditingCanvasId(null);
+    setIsSidebarOpen(false);
+    return data;
+  }, [canvases.length, labels.newIdea, labels.untitledCanvas]);
+
+  const deleteCanvas = useCallback(
+    (id: string) => {
+      if (canvases.length <= 1) return null;
+      const filtered = canvases.filter((canvas) => canvas.id !== id);
+      if (!filtered.length) return null;
+      if (id === currentCanvasId) {
+        const fallback = filtered[0];
+        setCanvases(filtered);
+        setCurrentCanvasId(fallback.id);
+        setEditingCanvasId(null);
+        setIsSidebarOpen(false);
+        return fallback.data;
+      }
+      setCanvases(filtered);
+      return null;
+    },
+    [canvases, currentCanvasId]
+  );
+
+  const startRename = useCallback(
+    (canvasId: string) => {
+      const target = canvases.find((canvas) => canvas.id === canvasId);
+      if (!target) return;
+      setEditingCanvasId(canvasId);
+      setTempCanvasName(target.name);
+    },
+    [canvases]
+  );
+
+  const saveRename = useCallback(
+    (canvasId: string) => {
+      if (!editingCanvasId) return;
+      setCanvases((prev) =>
+        prev.map((canvas) =>
+          canvas.id === canvasId
+            ? {
+                ...canvas,
+                name: tempCanvasName.trim() || canvas.name,
+              }
+            : canvas
+        )
+      );
+      setEditingCanvasId(null);
+    },
+    [editingCanvasId, tempCanvasName]
+  );
+
+  const cancelRename = useCallback(() => {
+    setEditingCanvasId(null);
+    setTempCanvasName('');
+  }, []);
+
+  const updateCanvasData = useCallback((canvasId: string, project: MindMapProject) => {
+    setCanvases((prev) =>
+      prev.map((canvas) =>
+        canvas.id === canvasId
+          ? {
+              ...canvas,
+              data: project,
+              updatedAt: Date.now(),
+            }
+          : canvas
+      )
+    );
+  }, []);
+
+  return {
+    canvases,
+    currentCanvasId,
+    currentCanvas,
+    isSidebarOpen,
+    editingCanvasId,
+    tempCanvasName,
+    openSidebar,
+    closeSidebar,
+    toggleSidebar,
+    selectCanvas,
+    createCanvas,
+    deleteCanvas,
+    startRename,
+    saveRename,
+    cancelRename,
+    setTempCanvasName,
+    updateCanvasData,
+  };
+};
