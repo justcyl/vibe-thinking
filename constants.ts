@@ -1,5 +1,5 @@
 
-import { NodeType, MindMapProject } from './types';
+import { NodeType, MindMapProject, NodeSize } from './types';
 import { Lightbulb, Search, Box, AlertCircle, Play, Paperclip, AtSign, File, GripVertical } from 'lucide-react';
 
 // Minimalist Dark Theme with Colored Headers - Updated for vibrancy
@@ -192,7 +192,12 @@ export const INITIAL_DATA: MindMapProject = {
 
 // Fixed dimensions for compact view
 export const NODE_WIDTH = 260; 
-export const NODE_HEIGHT = 140; 
+export const NODE_HEIGHT_MAP: Record<NodeSize, number> = {
+  small: 120,
+  medium: 140,
+  large: 180,
+};
+export const NODE_HEIGHT = NODE_HEIGHT_MAP.medium;
 
 export const LABELS = {
   appTitle: "Vibe-Thinking",
@@ -204,6 +209,10 @@ export const LABELS = {
   orientation: "排列方向",
   vertical: "纵向",
   horizontal: "横向",
+  nodeSize: "节点高度",
+  sizeSmall: "紧凑",
+  sizeMedium: "适中",
+  sizeLarge: "宽松",
   export: "导出",
   exportJson: "导出 JSON",
   nodeProperties: "节点属性",

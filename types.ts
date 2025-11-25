@@ -67,6 +67,7 @@ export type Orientation = 'vertical' | 'horizontal';
 export interface ViewSettings {
   theme: Theme;
   orientation: Orientation;
+  nodeSize: NodeSize;
 }
 
 export interface Canvas {
@@ -104,3 +105,5 @@ export interface AgentResponse {
   reply: string;
   operations: AgentOperation[];
 }
+
+export type NodeSize = 'small' | 'medium' | 'large';

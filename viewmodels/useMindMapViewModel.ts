@@ -39,7 +39,7 @@ export interface MindMapViewModel {
   editingNodeId: string | null;
   setEditingNodeId: (id: string | null) => void;
   viewSettings: ViewSettings;
-  toggleSetting: (key: keyof ViewSettings, value: Theme | Orientation) => void;
+  toggleSetting: <K extends keyof ViewSettings>(key: K, value: ViewSettings[K]) => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
   isExportOpen: boolean;
@@ -151,6 +151,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
   const [viewSettings, setViewSettings] = useState<ViewSettings>({
     theme: 'dark',
     orientation: 'vertical',
+    nodeSize: 'medium',
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -392,7 +393,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     [canvases.length, deleteCanvas, loadHistory, t.confirmDelete]
   );
 
-  const toggleSetting = useCallback((key: keyof ViewSettings, value: Theme | Orientation) => {
+  const toggleSetting = useCallback(<K extends keyof ViewSettings>(key: K, value: ViewSettings[K]) => {
     setViewSettings((prev) => ({ ...prev, [key]: value }));
   }, []);
 

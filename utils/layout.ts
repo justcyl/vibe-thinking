@@ -62,7 +62,8 @@ interface D3Data extends MindMapNode {
 
 export const calculateTreeLayout = (
   project: MindMapProject, 
-  orientation: Orientation
+  orientation: Orientation,
+  nodeHeight: number = NODE_HEIGHT
 ): { nodes: LayoutNode[], links: LayoutLink[] } => {
   
   let allNodes: LayoutNode[] = [];
@@ -72,8 +73,8 @@ export const calculateTreeLayout = (
   
   // Compact Spacing configurations
   const nodeSize: [number, number] = isVertical 
-    ? [NODE_WIDTH * 1.1, NODE_HEIGHT * 1.5] 
-    : [NODE_HEIGHT * 1.5, NODE_WIDTH * 1.2];
+    ? [NODE_WIDTH * 1.1, nodeHeight * 1.5] 
+    : [nodeHeight * 1.5, NODE_WIDTH * 1.2];
 
   // 1. Build D3 Hierarchy for each root
   project.rootIds.forEach(rootId => {
@@ -369,7 +370,7 @@ export const getFormattedGlobalContextString = (project: MindMapProject): string
 };
 
 // Calculate total bounds of the layout for export
-export const getLayoutBounds = (nodes: LayoutNode[], padding: number = 100) => {
+export const getLayoutBounds = (nodes: LayoutNode[], padding: number = 100, nodeHeight: number = NODE_HEIGHT) => {
     if (nodes.length === 0) return { x: 0, y: 0, width: 800, height: 600 };
 
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -378,8 +379,8 @@ export const getLayoutBounds = (nodes: LayoutNode[], padding: number = 100) => {
         // Assume node.x and node.y are center points based on NodeItem styling
         minX = Math.min(minX, node.x - NODE_WIDTH / 2);
         maxX = Math.max(maxX, node.x + NODE_WIDTH / 2);
-        minY = Math.min(minY, node.y - NODE_HEIGHT / 2);
-        maxY = Math.max(maxY, node.y + NODE_HEIGHT / 2);
+        minY = Math.min(minY, node.y - nodeHeight / 2);
+        maxY = Math.max(maxY, node.y + nodeHeight / 2);
     });
 
     return {

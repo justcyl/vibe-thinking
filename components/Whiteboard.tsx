@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MindMapProject, LayoutNode, LayoutLink, ViewSettings } from '../types';
 import { calculateTreeLayout } from '../utils/layout';
 import { NodeItem } from './NodeItem';
-import { NODE_HEIGHT, NODE_WIDTH } from '../constants';
+import { NODE_HEIGHT, NODE_HEIGHT_MAP, NODE_WIDTH } from '../constants';
 import { Plus, Minus, RotateCcw } from 'lucide-react';
 
 interface WhiteboardProps {
@@ -58,12 +58,13 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   
   const containerRef = useRef<HTMLDivElement>(null);
   const isVertical = settings.orientation === 'vertical';
+  const nodeHeight = NODE_HEIGHT_MAP[settings.nodeSize] ?? NODE_HEIGHT;
 
   // Calculate layout whenever data or orientation changes
   useEffect(() => {
-    const { nodes, links } = calculateTreeLayout(data, settings.orientation);
+    const { nodes, links } = calculateTreeLayout(data, settings.orientation, nodeHeight);
     setLayout({ nodes, links });
-  }, [data, settings.orientation]);
+  }, [data, settings.orientation, nodeHeight]);
 
   // Center the view on mount
   useEffect(() => {
@@ -182,9 +183,9 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
   // Path Generators: Connect from edge to edge (Top/Bottom or Left/Right)
   const getPath = (source: LayoutNode, target: LayoutNode) => {
-    const sourceHalfH = NODE_HEIGHT / 2;
+    const sourceHalfH = nodeHeight / 2;
     const sourceHalfW = NODE_WIDTH / 2;
-    const targetHalfH = NODE_HEIGHT / 2;
+    const targetHalfH = nodeHeight / 2;
     const targetHalfW = NODE_WIDTH / 2;
 
     if (settings.orientation === 'vertical') {
@@ -296,6 +297,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
               isGenerating={isGenerating && selectedId === node.id}
               theme={settings.theme}
               orientation={settings.orientation}
+              nodeHeight={nodeHeight}
             />
           ))}
         </div>

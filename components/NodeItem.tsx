@@ -1,11 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { LayoutNode, Theme, Orientation } from '../types';
-import { THEME_COLORS, NODE_ICONS, NODE_WIDTH, NODE_HEIGHT } from '../constants';
+import { THEME_COLORS, NODE_ICONS, NODE_WIDTH } from '../constants';
 import { Plus, Trash2, Sparkles, Edit2, Copy } from 'lucide-react';
 
 interface NodeItemProps {
   node: LayoutNode;
+  nodeHeight: number;
   isSelected: boolean;
   isEditing: boolean;
   onSelect: (id: string) => void;
@@ -39,7 +40,8 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   isRoot,
   isGenerating,
   theme,
-  orientation
+  orientation,
+  nodeHeight,
 }) => {
   const [tempContent, setTempContent] = useState(node.content);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -117,7 +119,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         left: node.x,
         top: node.y,
         width: NODE_WIDTH,
-        height: NODE_HEIGHT,
+        height: nodeHeight,
         transform: 'translate(-50%, -50%)',
         zIndex: isSelected ? 50 : 10,
         cursor: !isEditing ? 'move' : 'default'

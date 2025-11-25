@@ -243,6 +243,29 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
                   {t.horizontal}
                 </button>
               </div>
+              <div className="mt-3">
+                <div className="text-[10px] font-bold uppercase mb-1 opacity-70">{t.nodeSize}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => toggleSetting('nodeSize', 'small')}
+                    className={`py-1.5 border text-[10px] font-bold uppercase rounded ${viewSettings.nodeSize === 'small' ? 'bg-white/20 border-white/40' : 'opacity-50'}`}
+                  >
+                    {t.sizeSmall}
+                  </button>
+                  <button
+                    onClick={() => toggleSetting('nodeSize', 'medium')}
+                    className={`py-1.5 border text-[10px] font-bold uppercase rounded ${viewSettings.nodeSize === 'medium' ? 'bg-white/20 border-white/40' : 'opacity-50'}`}
+                  >
+                    {t.sizeMedium}
+                  </button>
+                  <button
+                    onClick={() => toggleSetting('nodeSize', 'large')}
+                    className={`py-1.5 border text-[10px] font-bold uppercase rounded ${viewSettings.nodeSize === 'large' ? 'bg-white/20 border-white/40' : 'opacity-50'}`}
+                  >
+                    {t.sizeLarge}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
