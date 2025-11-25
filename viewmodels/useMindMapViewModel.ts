@@ -76,7 +76,8 @@ export interface MindMapViewModel {
   tempCanvasName: string;
   setTempCanvasName: (value: string) => void;
   startRename: (canvasId: string) => void;
-  saveRename: (canvasId: string) => void;
+  saveRename: (canvasId: string, name?: string) => void;
+  getCurrentCanvasId: () => string;
   isAgentOpen: boolean;
   toggleAgent: () => void;
   closeAgent: () => void;
@@ -121,6 +122,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     setTempCanvasName,
     startRename,
     saveRename,
+    getCurrentCanvasId,
     createCanvas,
     selectCanvas,
     deleteCanvas,
@@ -138,7 +140,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     updateCurrent,
   } = useHistoryManager({
     initialData: INITIAL_DATA,
-    onChange: (project) => updateCanvasData(currentCanvasId, project),
+    onChange: (project) => updateCanvasData(getCurrentCanvasId(), project),
   });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);

@@ -32,6 +32,7 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     canvases,
     currentCanvas,
     currentCanvasId,
+    getCurrentCanvasId,
     selectedId,
     setSelectedId,
     editingNodeId,
@@ -138,14 +139,14 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
                 <span className="font-bold tracking-tight text-sm">Vibe-Thinking</span>
               </div>
               <div className="h-4 w-px bg-neutral-700/50 mx-1" />
-              <div className="min-w-[80px]" onDoubleClick={() => currentCanvas && startRename(currentCanvas.id)}>
+              <div className="min-w-[80px]" onDoubleClick={() => startRename(currentCanvasId)}>
                 {editingCanvasId === currentCanvasId ? (
                   <input
                     autoFocus
                     value={tempCanvasName}
                     onChange={(e) => setTempCanvasName(e.target.value)}
-                    onBlur={() => saveRename(currentCanvasId)}
-                    onKeyDown={(e) => e.key === 'Enter' && saveRename(currentCanvasId)}
+                    onBlur={(e) => saveRename(currentCanvasId, e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveRename(currentCanvasId, e.currentTarget.value)}
                     className="bg-transparent border-b outline-none text-xs font-mono w-full"
                   />
                 ) : (

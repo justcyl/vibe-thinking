@@ -16,7 +16,7 @@ interface CanvasDrawerProps {
   onCreateCanvas: () => void;
   onDeleteCanvas: (id: string) => void;
   onStartRename: (id: string) => void;
-  onSaveRename: (id: string) => void;
+  onSaveRename: (id: string, nextName?: string) => void;
   onClose: () => void;
 }
 
@@ -78,9 +78,14 @@ export const CanvasDrawer: React.FC<CanvasDrawerProps> = ({
                     autoFocus
                     value={tempCanvasName}
                     onChange={(event) => onTempCanvasNameChange(event.target.value)}
-                    onBlur={() => onSaveRename(canvas.id)}
-                    onKeyDown={(event) => event.key === 'Enter' && onSaveRename(canvas.id)}
+                    onBlur={(event) => onSaveRename(canvas.id, event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        onSaveRename(canvas.id, (event.target as HTMLInputElement).value);
+                      }
+                    }}
                     onClick={(event) => event.stopPropagation()}
+                    onFocus={(event) => event.currentTarget.select()}
                     className="bg-transparent border-b outline-none text-xs w-full"
                   />
                 ) : (
