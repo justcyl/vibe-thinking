@@ -83,9 +83,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
   } = viewModel;
 
   const exportRef = useRef<HTMLDivElement>(null);
-  const topBtnDark = 'bg-[#18181b] hover:bg-neutral-800 text-neutral-300 border-neutral-800';
-  const topBtnLight = 'bg-white hover:bg-neutral-100 text-neutral-700 border-neutral-200';
-  const topBtnStyle = viewSettings.theme === 'dark' ? topBtnDark : topBtnLight;
+  const topBtnStyle =
+    'w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-zinc-900/50 hover:bg-zinc-800 text-neutral-100 shadow-lg border border-zinc-800/60';
 
   return (
     <div className={`w-full h-screen flex overflow-hidden relative ${viewSettings.theme === 'dark' ? 'bg-[#09090b]' : 'bg-white'}`}>
@@ -161,42 +160,54 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
           </div>
 
           <div className="absolute top-6 right-6 flex items-center gap-3 pointer-events-auto">
-            <button onClick={undo} disabled={!canUndo} className={`${topBtnStyle} ${!canUndo ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <Undo2 size={16} />
-            </button>
-            <button onClick={redo} disabled={!canRedo} className={`${topBtnStyle} ${!canRedo ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <Redo2 size={16} />
+            <button onClick={handleAddFloatingNode} className={topBtnStyle}>
+              <Plus size={18} />
             </button>
 
-            <div className="relative group">
-              <button onClick={() => setIsExportOpen(!isExportOpen)} className={`${topBtnStyle}`}>
-                <Download size={16} />
+            <div className="h-5 w-px bg-neutral-700/50 mx-2" />
+
+            <div className="flex items-center gap-2">
+              <button onClick={undo} disabled={!canUndo} className={`${topBtnStyle} ${!canUndo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <Undo2 size={16} />
               </button>
-              {isExportOpen && (
-                <div
-                  className={`absolute top-full right-0 mt-2 w-48 rounded-lg border shadow-xl py-1 z-50 ${viewSettings.theme === 'dark' ? 'bg-[#18181b] border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-black'}`}
-                >
-                  <button onClick={handleExportJson} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
-                    <FileJson size={14} /> {t.exportJson}
-                  </button>
-                  <button onClick={() => handleExportImage(exportRef.current)} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
-                    <ImageIcon size={14} /> {t.exportImage}
-                  </button>
-                  <div className={`h-px mx-2 my-1 ${viewSettings.theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
-                  <button onClick={handleCopyGlobalContext} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
-                    <Clipboard size={14} /> {t.copyGlobal}
-                  </button>
-                </div>
-              )}
+              <button onClick={redo} disabled={!canRedo} className={`${topBtnStyle} ${!canRedo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <Redo2 size={16} />
+              </button>
             </div>
 
-            <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className={`${topBtnStyle}`}>
-              <Settings size={16} />
-            </button>
+            <div className="h-5 w-px bg-neutral-700/50 mx-2" />
 
-            <button onClick={toggleAgent} className="w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-lg bg-[#7c3aed] hover:bg-[#6d28d9] text-white">
-              <Bot size={18} />
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="relative group">
+                <button onClick={() => setIsExportOpen(!isExportOpen)} className={topBtnStyle}>
+                  <Download size={16} />
+                </button>
+                {isExportOpen && (
+                  <div
+                    className={`absolute top-full right-0 mt-2 w-48 rounded-lg border shadow-xl py-1 z-50 ${viewSettings.theme === 'dark' ? 'bg-[#18181b] border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-black'}`}
+                  >
+                    <button onClick={handleExportJson} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
+                      <FileJson size={14} /> {t.exportJson}
+                    </button>
+                    <button onClick={() => handleExportImage(exportRef.current)} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
+                      <ImageIcon size={14} /> {t.exportImage}
+                    </button>
+                    <div className={`h-px mx-2 my-1 ${viewSettings.theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
+                    <button onClick={handleCopyGlobalContext} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
+                      <Clipboard size={14} /> {t.copyGlobal}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className={topBtnStyle}>
+                <Settings size={16} />
+              </button>
+
+              <button onClick={toggleAgent} className={topBtnStyle}>
+                <Bot size={18} />
+              </button>
+            </div>
           </div>
 
           {isSettingsOpen && (
@@ -237,16 +248,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
               </div>
             </div>
           )}
-
-          <div className="absolute bottom-6 left-6 pointer-events-auto">
-            <button
-              onClick={handleAddFloatingNode}
-              className="flex items-center gap-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-6 py-3 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 font-medium tracking-wide"
-            >
-              <Plus size={20} />
-              <span>{t.floatingNode}</span>
-            </button>
-          </div>
 
           {notification && (
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold uppercase animate-bounce z-50 border border-white/20 shadow-xl pointer-events-auto">
