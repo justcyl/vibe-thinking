@@ -249,6 +249,40 @@ export const updateRootPosition = (
     return updateNode(project, rootId, () => ({ x, y }));
 };
 
+/**
+ * 重新排序父节点的 children 列表，保持集合一致。
+ */
+export const reorderChildren = (
+  project: MindMapProject,
+  parentId: string,
+  orderedChildIds: string[]
+): MindMapProject => {
+  const parent = project.nodes[parentId];
+  if (!parent) return project;
+
+  const currentChildren = parent.children;
+  if (currentChildren.length !== orderedChildIds.length) return project;
+
+  const sameSet =
+    orderedChildIds.every((id) => currentChildren.includes(id)) &&
+    currentChildren.every((id) => orderedChildIds.includes(id));
+  if (!sameSet) return project;
+
+  const noChange = currentChildren.every((id, index) => id === orderedChildIds[index]);
+  if (noChange) return project;
+
+  return {
+    ...project,
+    nodes: {
+      ...project.nodes,
+      [parentId]: {
+        ...parent,
+        children: [...orderedChildIds],
+      },
+    },
+  };
+};
+
 // --- Helpers ---
 
 export const getParentId = (project: MindMapProject, nodeId: string): string | null => {

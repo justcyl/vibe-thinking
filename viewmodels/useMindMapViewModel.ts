@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { LABELS, INITIAL_DATA } from '@/constants';
 import {
   MindMapNode,
@@ -16,6 +16,7 @@ import {
   updateNode,
   getPathToNode,
   updateRootPosition,
+  reorderChildren,
   getParentId,
   generateNodeId,
   getContextJsonString,
@@ -53,6 +54,8 @@ export interface MindMapViewModel {
   handleTypeChange: (nodeId: string, newType: NodeType) => void;
   handleCycleType: (nodeId: string) => void;
   handleMoveRoot: (id: string, x: number, y: number) => void;
+  handleReorderChildren: (parentId: string, orderedChildIds: string[]) => void;
+  handleCommitReorder: () => void;
   handleCopyContext: (nodeId: string) => void;
   handleCopyGlobalContext: () => void;
   handleExportJson: () => void;
@@ -172,6 +175,8 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     availableNodes,
   } = useAgentInterface({ data, pushState, getGlobalNodeIds });
 
+  const latestProjectRef = useRef<MindMapProject>(data);
+
   const handleAddChild = useCallback(
     (parentId: string) => {
       const parentNode = data.nodes[parentId];
@@ -269,6 +274,25 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     },
     [updateCurrent]
   );
+
+  useEffect(() => {
+    latestProjectRef.current = data;
+  }, [data]);
+
+  const handleReorderChildren = useCallback(
+    (parentId: string, orderedChildIds: string[]) => {
+      updateCurrent((project) => {
+        const nextProject = reorderChildren(project, parentId, orderedChildIds);
+        latestProjectRef.current = nextProject;
+        return nextProject;
+      });
+    },
+    [updateCurrent]
+  );
+
+  const handleCommitReorder = useCallback(() => {
+    pushState(latestProjectRef.current);
+  }, [pushState]);
 
   const showNotification = useCallback((message: string, duration = 2000) => {
     setNotification(message);
@@ -437,6 +461,8 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     handleTypeChange,
     handleCycleType,
     handleMoveRoot,
+    handleReorderChildren,
+    handleCommitReorder,
     handleCopyContext,
     handleCopyGlobalContext,
     handleExportJson,

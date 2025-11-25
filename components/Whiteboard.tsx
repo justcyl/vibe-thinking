@@ -20,6 +20,8 @@ interface WhiteboardProps {
   onGenerateAI: (id: string) => void;
   onMoveRoot: (id: string, x: number, y: number) => void;
   onCopyContext: (id: string) => void;
+  onReorderChildren: (parentId: string, orderedChildIds: string[]) => void;
+  onCommitReorder: () => void;
   isGenerating: boolean;
 }
 
@@ -37,6 +39,8 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   onGenerateAI,
   onMoveRoot,
   onCopyContext,
+  onReorderChildren,
+  onCommitReorder,
   isGenerating
 }) => {
   const [layout, setLayout] = useState<{ nodes: LayoutNode[], links: LayoutLink[] }>({ nodes: [], links: [] });
@@ -45,9 +49,15 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   // Interaction State
   const [isPanning, setIsPanning] = useState(false);
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
+  const [dragMode, setDragMode] = useState<'root' | 'reorder' | null>(null);
+  const [draggedParentId, setDraggedParentId] = useState<string | null>(null);
+  const [hasSiblingReordered, setHasSiblingReordered] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const [dragStartMousePos, setDragStartMousePos] = useState({ x: 0, y: 0 });
+  const [dragStartNodePos, setDragStartNodePos] = useState<{ x: number; y: number } | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
+  const isVertical = settings.orientation === 'vertical';
 
   // Calculate layout whenever data or orientation changes
   useEffect(() => {
@@ -78,11 +88,14 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     }
   };
 
+  const arraysEqual = (a: string[], b: string[]) => a.length === b.length && a.every((id, idx) => id === b[idx]);
+
   const handleMouseDown = (e: React.MouseEvent) => {
     // Background click -> Pan
     if (e.target === containerRef.current || (e.target as HTMLElement).closest('svg')) {
       setIsPanning(true);
       setLastMousePos({ x: e.clientX, y: e.clientY });
+      setDragStartMousePos({ x: e.clientX, y: e.clientY });
       onSelect(null);
       onEditEnd();
     }
@@ -91,9 +104,20 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   const handleNodeMouseDown = (e: React.MouseEvent, nodeId: string) => {
       // Check if it's a root node in our layout
       const node = layout.nodes.find(n => n.id === nodeId);
-      if (node && !node.parentId) {
-          setDraggedNodeId(nodeId);
-          setLastMousePos({ x: e.clientX, y: e.clientY });
+      if (!node) return;
+
+      setDraggedNodeId(nodeId);
+      setLastMousePos({ x: e.clientX, y: e.clientY });
+      setDragStartMousePos({ x: e.clientX, y: e.clientY });
+      setDragStartNodePos({ x: node.x, y: node.y });
+
+      if (!node.parentId) {
+        setDragMode('root');
+        setDraggedParentId(null);
+      } else {
+        setDragMode('reorder');
+        setDraggedParentId(node.parentId);
+        setHasSiblingReordered(false);
       }
   };
 
@@ -104,7 +128,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
     if (isPanning) {
       setViewport(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
-    } else if (draggedNodeId) {
+    } else if (draggedNodeId && dragMode === 'root') {
         const node = layout.nodes.find(n => n.id === draggedNodeId);
         if (node) {
             const worldDx = dx / viewport.scale;
@@ -116,12 +140,44 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
             onMoveRoot(draggedNodeId, currentX + worldDx, currentY + worldDy);
         }
+    } else if (draggedNodeId && dragMode === 'reorder' && draggedParentId) {
+        const node = layout.nodes.find(n => n.id === draggedNodeId);
+        const parent = data.nodes[draggedParentId];
+        if (!node || !parent || !dragStartNodePos) return;
+
+        const totalDx = (e.clientX - dragStartMousePos.x) / viewport.scale;
+        const totalDy = (e.clientY - dragStartMousePos.y) / viewport.scale;
+        const projectedAxis = isVertical ? dragStartNodePos.x + totalDx : dragStartNodePos.y + totalDy;
+
+        const siblings = layout.nodes.filter(n => n.parentId === draggedParentId);
+        if (siblings.length <= 1 || parent.children.length <= 1) return;
+
+        const reordered = siblings
+          .map((sib) => ({
+            id: sib.id,
+            axis: sib.id === draggedNodeId ? projectedAxis : (isVertical ? sib.x : sib.y),
+            originalIndex: parent.children.indexOf(sib.id)
+          }))
+          .sort((a, b) => (a.axis === b.axis ? a.originalIndex - b.originalIndex : a.axis - b.axis))
+          .map(item => item.id);
+
+        if (!arraysEqual(reordered, parent.children)) {
+          onReorderChildren(draggedParentId, reordered);
+          setHasSiblingReordered(true);
+        }
     }
   };
 
   const handleMouseUp = () => {
+    if (dragMode === 'reorder' && hasSiblingReordered) {
+      onCommitReorder();
+    }
     setIsPanning(false);
     setDraggedNodeId(null);
+    setDraggedParentId(null);
+    setDragMode(null);
+    setHasSiblingReordered(false);
+    setDragStartNodePos(null);
   };
 
   // Path Generators: Connect from edge to edge (Top/Bottom or Left/Right)

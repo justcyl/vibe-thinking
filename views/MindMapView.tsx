@@ -48,6 +48,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     handleUpdateContent,
     handleGenerateAI,
     handleMoveRoot,
+    handleReorderChildren,
+    handleCommitReorder,
     handleCopyContext,
     handleExportJson,
     handleCopyGlobalContext,
@@ -117,6 +119,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
             onEditEnd={() => setEditingNodeId(null)}
             onGenerateAI={handleGenerateAI}
             onMoveRoot={handleMoveRoot}
+            onReorderChildren={handleReorderChildren}
+            onCommitReorder={handleCommitReorder}
             onCopyContext={handleCopyContext}
             isGenerating={isGenerating}
           />

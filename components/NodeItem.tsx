@@ -120,7 +120,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
         height: NODE_HEIGHT,
         transform: 'translate(-50%, -50%)',
         zIndex: isSelected ? 50 : 10,
-        cursor: isRoot && !isEditing ? 'move' : 'default'
+        cursor: !isEditing ? 'move' : 'default'
       }}
       onClick={(e) => {
         e.stopPropagation();
