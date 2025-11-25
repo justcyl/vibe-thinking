@@ -4,7 +4,9 @@ import { MindMapProject, LayoutNode, LayoutLink, ViewSettings } from '../types';
 import { calculateTreeLayout } from '../utils/layout';
 import { NodeItem } from './NodeItem';
 import { NODE_HEIGHT, NODE_HEIGHT_MAP, NODE_WIDTH } from '../constants';
-import { Plus, Minus, RotateCcw } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
+
+const DRAG_THRESHOLD = 4;
 
 interface WhiteboardProps {
   data: MindMapProject;
@@ -52,11 +54,14 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   const [dragMode, setDragMode] = useState<'root' | 'reorder' | null>(null);
   const [draggedParentId, setDraggedParentId] = useState<string | null>(null);
   const [hasSiblingReordered, setHasSiblingReordered] = useState(false);
+  const [hasDragMoved, setHasDragMoved] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [dragStartMousePos, setDragStartMousePos] = useState({ x: 0, y: 0 });
   const [dragStartNodePos, setDragStartNodePos] = useState<{ x: number; y: number } | null>(null);
+  const [dragPreviewOffset, setDragPreviewOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
   const containerRef = useRef<HTMLDivElement>(null);
+  const suppressClickRef = useRef(false);
   const isVertical = settings.orientation === 'vertical';
   const nodeHeight = NODE_HEIGHT_MAP[settings.nodeSize] ?? NODE_HEIGHT;
 
@@ -92,6 +97,12 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   const arraysEqual = (a: string[], b: string[]) => a.length === b.length && a.every((id, idx) => id === b[idx]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    window.getSelection()?.removeAllRanges();
+    suppressClickRef.current = false;
+    setHasDragMoved(false);
+    setDragPreviewOffset({ x: 0, y: 0 });
+
     // Background click -> Pan
     if (e.target === containerRef.current || (e.target as HTMLElement).closest('svg')) {
       setIsPanning(true);
@@ -103,10 +114,17 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   };
 
   const handleNodeMouseDown = (e: React.MouseEvent, nodeId: string) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      window.getSelection()?.removeAllRanges();
+      suppressClickRef.current = false;
+
       // Check if it's a root node in our layout
       const node = layout.nodes.find(n => n.id === nodeId);
       if (!node) return;
 
+      setHasDragMoved(false);
+      setDragPreviewOffset({ x: 0, y: 0 });
       setDraggedNodeId(nodeId);
       setLastMousePos({ x: e.clientX, y: e.clientY });
       setDragStartMousePos({ x: e.clientX, y: e.clientY });
@@ -125,10 +143,20 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   const handleMouseMove = (e: React.MouseEvent) => {
     const dx = e.clientX - lastMousePos.x;
     const dy = e.clientY - lastMousePos.y;
+    const totalDx = e.clientX - dragStartMousePos.x;
+    const totalDy = e.clientY - dragStartMousePos.y;
     setLastMousePos({ x: e.clientX, y: e.clientY });
+
+    if ((isPanning || draggedNodeId) && !hasDragMoved) {
+      const movedDistance = Math.hypot(totalDx, totalDy);
+      if (movedDistance > DRAG_THRESHOLD) {
+        setHasDragMoved(true);
+      }
+    }
 
     if (isPanning) {
       setViewport(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+      setDragPreviewOffset({ x: 0, y: 0 });
     } else if (draggedNodeId && dragMode === 'root') {
         const node = layout.nodes.find(n => n.id === draggedNodeId);
         if (node) {
@@ -141,14 +169,15 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
             onMoveRoot(draggedNodeId, currentX + worldDx, currentY + worldDy);
         }
+        setDragPreviewOffset({ x: 0, y: 0 });
     } else if (draggedNodeId && dragMode === 'reorder' && draggedParentId) {
         const node = layout.nodes.find(n => n.id === draggedNodeId);
         const parent = data.nodes[draggedParentId];
         if (!node || !parent || !dragStartNodePos) return;
 
-        const totalDx = (e.clientX - dragStartMousePos.x) / viewport.scale;
-        const totalDy = (e.clientY - dragStartMousePos.y) / viewport.scale;
-        const projectedAxis = isVertical ? dragStartNodePos.x + totalDx : dragStartNodePos.y + totalDy;
+        const worldDx = totalDx / viewport.scale;
+        const worldDy = totalDy / viewport.scale;
+        const projectedAxis = isVertical ? dragStartNodePos.x + worldDx : dragStartNodePos.y + worldDy;
 
         const siblings = layout.nodes.filter(n => n.parentId === draggedParentId);
         if (siblings.length <= 1 || parent.children.length <= 1) return;
@@ -166,6 +195,12 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
           onReorderChildren(draggedParentId, reordered);
           setHasSiblingReordered(true);
         }
+
+        const currentAxis = isVertical ? node.x : node.y;
+        const axisDelta = projectedAxis - currentAxis;
+        setDragPreviewOffset(isVertical ? { x: axisDelta, y: 0 } : { x: 0, y: axisDelta });
+    } else {
+        setDragPreviewOffset({ x: 0, y: 0 });
     }
   };
 
@@ -173,12 +208,29 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     if (dragMode === 'reorder' && hasSiblingReordered) {
       onCommitReorder();
     }
+    suppressClickRef.current = hasDragMoved;
+    if (hasDragMoved) {
+      setTimeout(() => {
+        suppressClickRef.current = false;
+      }, 0);
+    }
     setIsPanning(false);
     setDraggedNodeId(null);
     setDraggedParentId(null);
     setDragMode(null);
     setHasSiblingReordered(false);
+    setHasDragMoved(false);
     setDragStartNodePos(null);
+    setDragPreviewOffset({ x: 0, y: 0 });
+  };
+
+  // 防止拖拽松手时触发点击选择
+  const handleClickCapture = (e: React.MouseEvent) => {
+    if (suppressClickRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClickRef.current = false;
+    }
   };
 
   // Path Generators: Connect from edge to edge (Top/Bottom or Left/Right)
@@ -231,6 +283,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onClickCapture={handleClickCapture}
     >
       {/* Dot Grid Background */}
       <div 
@@ -284,6 +337,8 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
               node={node}
               isSelected={selectedId === node.id}
               isEditing={editingNodeId === node.id}
+              isDragging={draggedNodeId === node.id && hasDragMoved}
+              dragOffset={draggedNodeId === node.id && hasDragMoved ? dragPreviewOffset : { x: 0, y: 0 }}
               onSelect={onSelect}
               onAddChild={onAddChild}
               onDelete={onDelete}

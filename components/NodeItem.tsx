@@ -20,6 +20,8 @@ interface NodeItemProps {
   onMouseDown: (e: React.MouseEvent, nodeId: string) => void;
   isRoot: boolean;
   isGenerating: boolean;
+  isDragging: boolean;
+  dragOffset: { x: number; y: number };
   theme: Theme;
   orientation: Orientation;
 }
@@ -28,6 +30,8 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   node,
   isSelected,
   isEditing,
+  isDragging,
+  dragOffset,
   onSelect,
   onAddChild,
   onDelete,
@@ -108,24 +112,33 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     ? (theme === 'dark' ? 'border-2 border-white/80 ring-2 ring-purple-500/20' : 'border-2 border-black/80')
     : `border ${styleConfig.border}`;
 
-  const shadowClass = theme === 'dark' 
+  const baseShadowClass = theme === 'dark' 
     ? 'shadow-lg shadow-black/40' 
     : 'shadow-sm';
+  const shadowClass = isDragging
+    ? `${baseShadowClass} ring-2 ring-purple-500/30 shadow-purple-500/25`
+    : baseShadowClass;
 
   return (
     <div
-      className={`absolute transform transition-transform duration-75 ease-out group`}
+      className={`absolute transform transition-transform duration-150 ease-out group`}
       style={{
         left: node.x,
         top: node.y,
         width: NODE_WIDTH,
         height: nodeHeight,
-        transform: 'translate(-50%, -50%)',
-        zIndex: isSelected ? 50 : 10,
-        cursor: !isEditing ? 'move' : 'default'
+        transform: `translate(-50%, -50%) translate(${dragOffset.x}px, ${dragOffset.y}px) scale(${isDragging ? 1.02 : 1})`,
+        zIndex: isSelected ? 50 : isDragging ? 40 : 10,
+        cursor: isEditing ? 'default' : isDragging ? 'grabbing' : 'grab',
+        transition: isDragging ? 'transform 40ms linear' : undefined,
+        willChange: 'transform'
       }}
       onClick={(e) => {
         e.stopPropagation();
+        if (isDragging) {
+          e.preventDefault();
+          return;
+        }
         onSelect(node.id);
       }}
       onMouseDown={(e) => {
