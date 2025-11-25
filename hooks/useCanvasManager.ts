@@ -1,7 +1,23 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, MindMapProject, NodeType } from '@/types';
 import { LABELS } from '@/constants';
 import { generateNodeId } from '@/utils/layout';
+
+const CANVAS_STORAGE_KEY = 'vibe-thinking-canvases';
+
+const loadCanvasesFromStorage = (fallback: Canvas[]): Canvas[] => {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const cached = localStorage.getItem(CANVAS_STORAGE_KEY);
+    if (!cached) return fallback;
+    const parsed = JSON.parse(cached);
+    if (!Array.isArray(parsed) || parsed.length === 0) return fallback;
+    return parsed as Canvas[];
+  } catch (error) {
+    console.error('Failed to parse canvases from localStorage', error);
+    return fallback;
+  }
+};
 
 interface UseCanvasManagerOptions {
   initialData: MindMapProject;
@@ -45,9 +61,9 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     [initialData, labels.untitledCanvas]
   );
 
-  const [canvases, setCanvases] = useState<Canvas[]>([initialCanvas]);
-  const [currentCanvasId, setCurrentCanvasId] = useState(initialCanvas.id);
-  const currentCanvasIdRef = useRef(initialCanvas.id);
+  const [canvases, setCanvases] = useState<Canvas[]>(() => loadCanvasesFromStorage([initialCanvas]));
+  const [currentCanvasId, setCurrentCanvasId] = useState(() => canvases[0]?.id ?? initialCanvas.id);
+  const currentCanvasIdRef = useRef(currentCanvasId);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editSource, setEditSource] = useState<'sidebar' | 'header' | null>(null);
   const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
@@ -185,6 +201,15 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
       )
     );
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(CANVAS_STORAGE_KEY, JSON.stringify(canvases));
+    } catch (error) {
+      console.error('Failed to save canvases to localStorage', error);
+    }
+  }, [canvases]);
 
   return {
     canvases,
