@@ -13,6 +13,7 @@ interface CanvasManager {
   currentCanvasId: string;
   currentCanvas?: Canvas;
   isSidebarOpen: boolean;
+  editSource: 'sidebar' | 'header' | null;
   editingCanvasId: string | null;
   tempCanvasName: string;
   getCurrentCanvasId: () => string;
@@ -22,7 +23,7 @@ interface CanvasManager {
   selectCanvas: (id: string) => MindMapProject | null;
   createCanvas: () => MindMapProject;
   deleteCanvas: (id: string) => MindMapProject | null;
-  startRename: (canvasId: string) => void;
+  startRename: (canvasId: string, source: 'sidebar' | 'header') => void;
   saveRename: (canvasId: string, nextName?: string) => void;
   cancelRename: () => void;
   setTempCanvasName: (value: string) => void;
@@ -48,6 +49,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
   const [currentCanvasId, setCurrentCanvasId] = useState(initialCanvas.id);
   const currentCanvasIdRef = useRef(initialCanvas.id);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editSource, setEditSource] = useState<'sidebar' | 'header' | null>(null);
   const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
   const [tempCanvasName, setTempCanvasName] = useState('');
 
@@ -62,6 +64,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
       const target = canvases.find((canvas) => canvas.id === id);
       if (!target) return null;
       setEditingCanvasId(null);
+      setEditSource(null);
       if (target.id === currentCanvasId) {
         return null;
       }
@@ -107,6 +110,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     currentCanvasIdRef.current = canvas.id;
     setCurrentCanvasId(canvas.id);
     setEditingCanvasId(null);
+    setEditSource(null);
     return data;
   }, [canvases.length, labels.newIdea, labels.untitledCanvas, getGlobalNodeIds]);
 
@@ -121,6 +125,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
         currentCanvasIdRef.current = fallback.id;
         setCurrentCanvasId(fallback.id);
         setEditingCanvasId(null);
+        setEditSource(null);
         return fallback.data;
       }
       setCanvases(filtered);
@@ -130,10 +135,11 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
   );
 
   const startRename = useCallback(
-    (canvasId: string) => {
+    (canvasId: string, source: 'sidebar' | 'header') => {
       const target = canvases.find((canvas) => canvas.id === canvasId);
       if (!target) return;
       setEditingCanvasId(canvasId);
+      setEditSource(source);
       setTempCanvasName(target.name);
     },
     [canvases]
@@ -154,6 +160,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
         )
       );
       setEditingCanvasId(null);
+      setEditSource(null);
       setTempCanvasName('');
     },
     [tempCanvasName]
@@ -161,6 +168,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
 
   const cancelRename = useCallback(() => {
     setEditingCanvasId(null);
+    setEditSource(null);
     setTempCanvasName('');
   }, []);
 
@@ -183,6 +191,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     currentCanvasId,
     currentCanvas,
     isSidebarOpen,
+    editSource,
     editingCanvasId,
     tempCanvasName,
     getCurrentCanvasId: () => currentCanvasIdRef.current,

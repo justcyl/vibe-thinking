@@ -65,6 +65,7 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     isSidebarOpen,
     openSidebar,
     closeSidebar,
+    editSource,
     editingCanvasId,
     tempCanvasName,
     setTempCanvasName,
@@ -94,6 +95,7 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
         viewSettings={viewSettings}
         isOpen={isSidebarOpen}
         labels={t}
+        editSource={editSource}
         editingCanvasId={editingCanvasId}
         tempCanvasName={tempCanvasName}
         onTempCanvasNameChange={setTempCanvasName}
@@ -139,8 +141,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
                 <span className="font-bold tracking-tight text-sm">Vibe-Thinking</span>
               </div>
               <div className="h-4 w-px bg-neutral-700/50 mx-1" />
-              <div className="min-w-[80px]" onDoubleClick={() => startRename(currentCanvasId)}>
-                {editingCanvasId === currentCanvasId ? (
+              <div className="min-w-[80px]" onDoubleClick={() => startRename(currentCanvasId, 'header')}>
+                {editingCanvasId === currentCanvasId && editSource === 'header' ? (
                   <input
                     autoFocus
                     value={tempCanvasName}

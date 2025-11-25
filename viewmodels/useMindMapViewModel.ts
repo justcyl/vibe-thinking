@@ -72,10 +72,11 @@ export interface MindMapViewModel {
   closeSidebar: () => void;
   toggleSidebar: () => void;
   isSidebarOpen: boolean;
+  editSource: 'sidebar' | 'header' | null;
   editingCanvasId: string | null;
   tempCanvasName: string;
   setTempCanvasName: (value: string) => void;
-  startRename: (canvasId: string) => void;
+  startRename: (canvasId: string, source: 'sidebar' | 'header') => void;
   saveRename: (canvasId: string, name?: string) => void;
   getCurrentCanvasId: () => string;
   isAgentOpen: boolean;
@@ -117,6 +118,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     openSidebar,
     closeSidebar,
     toggleSidebar,
+    editSource,
     editingCanvasId,
     tempCanvasName,
     setTempCanvasName,
@@ -503,6 +505,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     closeSidebar,
     toggleSidebar,
     isSidebarOpen,
+    editSource,
     editingCanvasId,
     tempCanvasName,
     setTempCanvasName,

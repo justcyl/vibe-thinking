@@ -9,13 +9,14 @@ interface CanvasDrawerProps {
   viewSettings: ViewSettings;
   isOpen: boolean;
   labels?: typeof LABELS;
+  editSource: 'sidebar' | 'header' | null;
   editingCanvasId: string | null;
   tempCanvasName: string;
   onTempCanvasNameChange: (value: string) => void;
   onSelectCanvas: (id: string) => void;
   onCreateCanvas: () => void;
   onDeleteCanvas: (id: string) => void;
-  onStartRename: (id: string) => void;
+  onStartRename: (id: string, source: 'sidebar' | 'header') => void;
   onSaveRename: (id: string, nextName?: string) => void;
   onClose: () => void;
 }
@@ -29,6 +30,7 @@ export const CanvasDrawer: React.FC<CanvasDrawerProps> = ({
   viewSettings,
   isOpen,
   labels = LABELS,
+  editSource,
   editingCanvasId,
   tempCanvasName,
   onTempCanvasNameChange,
@@ -73,7 +75,7 @@ export const CanvasDrawer: React.FC<CanvasDrawerProps> = ({
             >
               <div className="flex items-center gap-2 overflow-hidden">
                 <FileText size={14} />
-                {editingCanvasId === canvas.id ? (
+                {editingCanvasId === canvas.id && editSource === 'sidebar' ? (
                   <input
                     autoFocus
                     value={tempCanvasName}
@@ -96,7 +98,7 @@ export const CanvasDrawer: React.FC<CanvasDrawerProps> = ({
                 <button
                   onClick={(event) => {
                     event.stopPropagation();
-                    onStartRename(canvas.id);
+                    onStartRename(canvas.id, 'sidebar');
                   }}
                   className="p-1 hover:text-blue-500"
                 >
