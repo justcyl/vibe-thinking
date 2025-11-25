@@ -192,7 +192,7 @@ export const INITIAL_DATA: MindMapProject = {
 
 // Fixed dimensions for compact view
 export const NODE_WIDTH = 260; 
-export const NODE_HEIGHT = 100; 
+export const NODE_HEIGHT = 140; 
 
 export const LABELS = {
   appTitle: "Vibe-Thinking",

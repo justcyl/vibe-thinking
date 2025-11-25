@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MindMapProject, LayoutNode, LayoutLink, ViewSettings } from '../types';
 import { calculateTreeLayout } from '../utils/layout';
 import { NodeItem } from './NodeItem';
-import { NODE_WIDTH, NODE_HEIGHT } from '../constants';
+import { NODE_HEIGHT, NODE_WIDTH } from '../constants';
 import { Plus, Minus, RotateCcw } from 'lucide-react';
 
 interface WhiteboardProps {
@@ -125,24 +125,26 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   };
 
   // Path Generators: Connect from edge to edge (Top/Bottom or Left/Right)
-  const getPath = (source: { x: number, y: number }, target: { x: number, y: number }) => {
-    const halfH = NODE_HEIGHT / 2;
-    const halfW = NODE_WIDTH / 2;
+  const getPath = (source: LayoutNode, target: LayoutNode) => {
+    const sourceHalfH = NODE_HEIGHT / 2;
+    const sourceHalfW = NODE_WIDTH / 2;
+    const targetHalfH = NODE_HEIGHT / 2;
+    const targetHalfW = NODE_WIDTH / 2;
 
     if (settings.orientation === 'vertical') {
         // From Source Bottom to Target Top
         const startX = source.x;
-        const startY = source.y + halfH;
+        const startY = source.y + sourceHalfH;
         const endX = target.x;
-        const endY = target.y - halfH;
+        const endY = target.y - targetHalfH;
 
         const midY = (startY + endY) / 2;
         return `M ${startX} ${startY} L ${startX} ${midY} L ${endX} ${midY} L ${endX} ${endY}`;
     } else {
         // From Source Right to Target Left
-        const startX = source.x + halfW;
+        const startX = source.x + sourceHalfW;
         const startY = source.y;
-        const endX = target.x - halfW;
+        const endX = target.x - targetHalfW;
         const endY = target.y;
 
         const midX = (startX + endX) / 2;
