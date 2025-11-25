@@ -164,6 +164,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
   return (
     <div
+      id="whiteboard-root"
       ref={containerRef}
       className={`w-full h-full overflow-hidden relative cursor-default ${bgColor} ${isPanning ? 'cursor-grabbing' : ''}`}
       onWheel={handleWheel}

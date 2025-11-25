@@ -311,7 +311,11 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     (container: HTMLElement | null) => {
       if (!container) return;
       const { nodes } = calculateTreeLayout(data, viewSettings.orientation);
-      const bounds = getLayoutBounds(nodes, 100);
+      // 为导出取一圈固定留白，避免内容紧贴边缘
+      const PADDING = 32;
+      const bounds = getLayoutBounds(nodes, PADDING);
+      const exportWidth = Math.ceil(bounds.width);
+      const exportHeight = Math.ceil(bounds.height);
 
       const filter = (node: HTMLElement) => !node.classList?.contains('exclude-from-export');
 
@@ -320,26 +324,41 @@ export const useMindMapViewModel = (): MindMapViewModel => {
         backgroundColor: viewSettings.theme === 'dark' ? '#09090b' : '#ffffff',
         filter,
         fontEmbedCSS: '',
-        width: bounds.width,
-        height: bounds.height,
+        width: exportWidth,
+        height: exportHeight,
         style: {
-          width: `${bounds.width}px`,
-          height: `${bounds.height}px`,
+          width: `${exportWidth}px`,
+          height: `${exportHeight}px`,
           overflow: 'visible',
           maxHeight: 'none',
           maxWidth: 'none',
         },
-        onClone: (clonedDoc: any) => {
-          const viewport = clonedDoc.getElementById('whiteboard-viewport');
-          const grid = clonedDoc.getElementById('whiteboard-grid');
+        onClone: (clonedDoc: HTMLElement) => {
+          clonedDoc.style.width = `${exportWidth}px`;
+          clonedDoc.style.height = `${exportHeight}px`;
+          clonedDoc.style.maxWidth = 'none';
+          clonedDoc.style.maxHeight = 'none';
+          clonedDoc.style.overflow = 'visible';
+
+          const whiteboardRoot = clonedDoc.querySelector('#whiteboard-root') as HTMLElement | null;
+          const viewport = clonedDoc.querySelector('#whiteboard-viewport') as HTMLElement | null;
+          const grid = clonedDoc.querySelector('#whiteboard-grid') as HTMLElement | null;
+          if (whiteboardRoot) {
+            whiteboardRoot.style.width = `${exportWidth}px`;
+            whiteboardRoot.style.height = `${exportHeight}px`;
+            whiteboardRoot.style.overflow = 'visible';
+          }
           if (viewport) {
             viewport.style.transform = `translate(${-bounds.x}px, ${-bounds.y}px) scale(1)`;
             viewport.style.transformOrigin = '0 0';
+            viewport.style.width = `${exportWidth}px`;
+            viewport.style.height = `${exportHeight}px`;
           }
           if (grid) {
-            grid.style.width = '100%';
-            grid.style.height = '100%';
+            grid.style.width = `${exportWidth}px`;
+            grid.style.height = `${exportHeight}px`;
             grid.style.backgroundPosition = `${-bounds.x}px ${-bounds.y}px`;
+            grid.style.backgroundSize = '24px 24px';
           }
         },
       } as any)
