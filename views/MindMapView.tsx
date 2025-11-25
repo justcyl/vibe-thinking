@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { MindMapViewModel } from '@/viewmodels/useMindMapViewModel';
 import { Whiteboard } from '@/components/Whiteboard';
 import { AgentPanel } from '@/components/AgentPanel';
@@ -17,7 +16,6 @@ import {
   Plus,
   Clipboard,
   Bot,
-  Image as ImageIcon,
   FileJson,
 } from 'lucide-react';
 
@@ -52,7 +50,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     handleMoveRoot,
     handleCopyContext,
     handleExportJson,
-    handleExportImage,
     handleCopyGlobalContext,
     toggleSetting,
     handleCreateCanvas,
@@ -82,7 +79,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     availableNodes,
   } = viewModel;
 
-  const exportRef = useRef<HTMLDivElement>(null);
   const topBtnStyle =
     'w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-zinc-900/50 hover:bg-zinc-800 text-neutral-100 shadow-lg border border-zinc-800/60';
 
@@ -107,7 +103,7 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
       />
 
       <main className="flex-1 flex flex-col relative overflow-hidden">
-        <div ref={exportRef} className="flex-1 relative w-full h-full">
+        <div className="flex-1 relative w-full h-full">
           <Whiteboard
             data={data}
             settings={viewSettings}
@@ -188,9 +184,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
                   >
                     <button onClick={handleExportJson} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
                       <FileJson size={14} /> {t.exportJson}
-                    </button>
-                    <button onClick={() => handleExportImage(exportRef.current)} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">
-                      <ImageIcon size={14} /> {t.exportImage}
                     </button>
                     <div className={`h-px mx-2 my-1 ${viewSettings.theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
                     <button onClick={handleCopyGlobalContext} className="w-full text-left px-4 py-2 text-xs hover:bg-white/10 flex items-center gap-2">

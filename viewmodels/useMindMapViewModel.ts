@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { toPng } from 'html-to-image';
 import { LABELS, INITIAL_DATA } from '@/constants';
 import {
   MindMapNode,
@@ -21,8 +20,6 @@ import {
   generateNodeId,
   getContextJsonString,
   getFormattedGlobalContextString,
-  getLayoutBounds,
-  calculateTreeLayout,
   serializeProjectForExport,
 } from '@/utils/layout';
 import { generateBrainstormIdeas } from '@/services/geminiService';
@@ -59,7 +56,6 @@ export interface MindMapViewModel {
   handleCopyContext: (nodeId: string) => void;
   handleCopyGlobalContext: () => void;
   handleExportJson: () => void;
-  handleExportImage: (container: HTMLElement | null) => void;
   handleGenerateAI: (nodeId: string) => Promise<void>;
   handleCreateCanvas: () => void;
   handleSwitchCanvas: (id: string) => void;
@@ -307,73 +303,6 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     setIsExportOpen(false);
   }, [data, canvases, currentCanvasId, setIsExportOpen]);
 
-  const handleExportImage = useCallback(
-    (container: HTMLElement | null) => {
-      if (!container) return;
-      const { nodes } = calculateTreeLayout(data, viewSettings.orientation);
-      // 为导出取一圈固定留白，避免内容紧贴边缘
-      const PADDING = 32;
-      const bounds = getLayoutBounds(nodes, PADDING);
-      const exportWidth = Math.ceil(bounds.width);
-      const exportHeight = Math.ceil(bounds.height);
-
-      const filter = (node: HTMLElement) => !node.classList?.contains('exclude-from-export');
-
-      toPng(container, {
-        cacheBust: true,
-        backgroundColor: viewSettings.theme === 'dark' ? '#09090b' : '#ffffff',
-        filter,
-        fontEmbedCSS: '',
-        width: exportWidth,
-        height: exportHeight,
-        style: {
-          width: `${exportWidth}px`,
-          height: `${exportHeight}px`,
-          overflow: 'visible',
-          maxHeight: 'none',
-          maxWidth: 'none',
-        },
-        onClone: (clonedDoc: HTMLElement) => {
-          clonedDoc.style.width = `${exportWidth}px`;
-          clonedDoc.style.height = `${exportHeight}px`;
-          clonedDoc.style.maxWidth = 'none';
-          clonedDoc.style.maxHeight = 'none';
-          clonedDoc.style.overflow = 'visible';
-
-          const whiteboardRoot = clonedDoc.querySelector('#whiteboard-root') as HTMLElement | null;
-          const viewport = clonedDoc.querySelector('#whiteboard-viewport') as HTMLElement | null;
-          const grid = clonedDoc.querySelector('#whiteboard-grid') as HTMLElement | null;
-          if (whiteboardRoot) {
-            whiteboardRoot.style.width = `${exportWidth}px`;
-            whiteboardRoot.style.height = `${exportHeight}px`;
-            whiteboardRoot.style.overflow = 'visible';
-          }
-          if (viewport) {
-            viewport.style.transform = `translate(${-bounds.x}px, ${-bounds.y}px) scale(1)`;
-            viewport.style.transformOrigin = '0 0';
-            viewport.style.width = `${exportWidth}px`;
-            viewport.style.height = `${exportHeight}px`;
-          }
-          if (grid) {
-            grid.style.width = `${exportWidth}px`;
-            grid.style.height = `${exportHeight}px`;
-            grid.style.backgroundPosition = `${-bounds.x}px ${-bounds.y}px`;
-            grid.style.backgroundSize = '24px 24px';
-          }
-        },
-      } as any)
-        .then((dataUrl) => {
-          const link = document.createElement('a');
-          link.download = `${canvases.find((c) => c.id === currentCanvasId)?.name || 'brainstorm'}.png`;
-          link.href = dataUrl;
-          link.click();
-          setIsExportOpen(false);
-        })
-        .catch(() => showNotification('导出图片失败', 3000));
-    },
-    [data, viewSettings.orientation, viewSettings.theme, canvases, currentCanvasId, showNotification, setIsExportOpen]
-  );
-
   const handleGenerateAI = useCallback(
     async (nodeId: string) => {
       const targetNode = data.nodes[nodeId];
@@ -511,7 +440,6 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     handleCopyContext,
     handleCopyGlobalContext,
     handleExportJson,
-    handleExportImage,
     handleGenerateAI,
     handleCreateCanvas,
     handleSwitchCanvas,

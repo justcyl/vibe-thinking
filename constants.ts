@@ -206,7 +206,6 @@ export const LABELS = {
   horizontal: "横向",
   export: "导出",
   exportJson: "导出 JSON",
-  exportImage: "导出图片 (PNG)",
   nodeProperties: "节点属性",
   type: "类型",
   actions: "操作",
