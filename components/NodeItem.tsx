@@ -161,6 +161,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
 
   return (
     <div
+      data-node-item
       className={`absolute transform transition-transform duration-150 ease-out group`}
       style={{
         left: node.x,

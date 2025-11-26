@@ -101,13 +101,19 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    const isNodeSurface = target.closest('[data-node-item]');
+    const isControlSurface = target.closest('[data-whiteboard-control]');
+    // 如果命中节点或控件，交给各自的事件逻辑处理
+    if (isNodeSurface || isControlSurface) return;
+
     window.getSelection()?.removeAllRanges();
     suppressClickRef.current = false;
     setHasDragMoved(false);
     setDragPreviewOffset({ x: 0, y: 0 });
 
     // Background click -> Pan
-    if (e.target === containerRef.current || (e.target as HTMLElement).closest('svg')) {
+    if (containerRef.current && containerRef.current.contains(target)) {
       setIsPanning(true);
       setLastMousePos({ x: e.clientX, y: e.clientY });
       setDragStartMousePos({ x: e.clientX, y: e.clientY });
@@ -429,7 +435,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
       </div>
 
       {/* HUD Controls (Vertical Stack like Screenshot) */}
-      <div className={`${zoomContainerClass} ${zoomContainerStyle}`}>
+      <div className={`${zoomContainerClass} ${zoomContainerStyle}`} data-whiteboard-control>
         <button 
           className={`${zoomBtnClass} border-b border-neutral-800`}
           onClick={() => setViewport(prev => ({ ...prev, scale: prev.scale + 0.1 }))}
