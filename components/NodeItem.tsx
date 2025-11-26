@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { InlineMath } from 'react-katex';
 import { LayoutNode, Theme, Orientation } from '../types';
 import { THEME_COLORS, NODE_ICONS, NODE_WIDTH } from '../constants';
 import { Plus, Trash2, Sparkles, Edit2, Copy } from 'lucide-react';
@@ -121,6 +122,42 @@ export const NodeItem: React.FC<NodeItemProps> = ({
     ? `${baseShadowClass} ring-2 ring-purple-500/30 shadow-purple-500/25`
     : baseShadowClass;
   const dropHighlightClass = isDropTarget ? 'ring-2 ring-emerald-400 border-emerald-400 shadow-emerald-500/40' : '';
+  const renderContentWithLatex = (content: string) => {
+    // 将 $$ 包裹的片段转成 KaTeX，保留其余文本及换行
+    const nodes: React.ReactNode[] = [];
+    const regex = /\$\$([\s\S]+?)\$\$/g;
+    let lastIndex = 0;
+    let matchIndex = 0;
+
+    for (const match of content.matchAll(regex)) {
+      if (match.index === undefined) continue;
+      const [raw, expression] = match;
+      if (match.index > lastIndex) {
+        nodes.push(
+          <React.Fragment key={`text-${matchIndex}`}>
+            {content.slice(lastIndex, match.index)}
+          </React.Fragment>
+        );
+      }
+      nodes.push(
+        <span key={`math-${matchIndex}`} className="inline-block align-middle">
+          <InlineMath math={expression.trim()} errorColor="#ef4444" throwOnError={false} />
+        </span>
+      );
+      lastIndex = match.index + raw.length;
+      matchIndex += 1;
+    }
+
+    if (lastIndex < content.length) {
+      nodes.push(
+        <React.Fragment key="text-tail">
+          {content.slice(lastIndex)}
+        </React.Fragment>
+      );
+    }
+
+    return nodes.length ? nodes : [content];
+  };
 
   return (
     <div
@@ -212,12 +249,12 @@ export const NodeItem: React.FC<NodeItemProps> = ({
               onMouseDown={(e) => e.stopPropagation()} 
             />
           ) : (
-            <p 
-              className={`text-xs font-medium leading-relaxed ${styleConfig.text} break-words w-full h-full select-none overflow-y-auto custom-scrollbar`}
+            <div 
+              className={`text-xs font-medium leading-relaxed ${styleConfig.text} break-words w-full h-full select-none overflow-y-auto overflow-x-auto custom-scrollbar whitespace-pre-wrap`}
               style={{ scrollbarWidth: 'none' }}
             >
-              {node.content}
-            </p>
+              {renderContentWithLatex(node.content)}
+            </div>
           )}
         </div>
       </div>
