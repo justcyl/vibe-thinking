@@ -4,6 +4,7 @@ import {
   getFormattedContextString,
   getFormattedGlobalContextString,
   getLayoutBounds,
+  reparentNode,
   serializeForestForAgent,
   serializeProjectForExport,
   updateNode
@@ -95,6 +96,23 @@ describe('layout utils mutations', () => {
     expect(updated.nodes.child_evidence).toBeUndefined();
     expect(updated.nodes.grandchild).toBeUndefined();
     expect(updated.nodes.root.children).not.toContain('child_evidence');
+  });
+
+  it('嫁接节点到新的父节点时同步更新父子关系', () => {
+    const project = createProject();
+    const updated = reparentNode(project, 'child_action', 'child_evidence');
+
+    expect(updated).not.toBe(project);
+    expect(updated.nodes.child_action.parentId).toBe('child_evidence');
+    expect(updated.nodes.child_evidence.children).toContain('child_action');
+    expect(updated.nodes.root.children).not.toContain('child_action');
+  });
+
+  it('阻止将节点挂到自己的子树下以避免环', () => {
+    const project = createProject();
+    const updated = reparentNode(project, 'child_evidence', 'grandchild');
+
+    expect(updated).toBe(project);
   });
 });
 

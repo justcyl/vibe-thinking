@@ -284,6 +284,80 @@ export const reorderChildren = (
   };
 };
 
+const collectDescendants = (project: MindMapProject, nodeId: string, acc: Set<string>) => {
+  const node = project.nodes[nodeId];
+  if (!node) return acc;
+  node.children.forEach((childId) => {
+    if (acc.has(childId)) return;
+    acc.add(childId);
+    collectDescendants(project, childId, acc);
+  });
+  return acc;
+};
+
+/**
+ * 将节点嫁接到新的父节点下，保证树结构无环。
+ */
+export const reparentNode = (
+  project: MindMapProject,
+  nodeId: string,
+  newParentId: string | null,
+  position?: number
+): MindMapProject => {
+  const node = project.nodes[nodeId];
+  if (!node) return project;
+  if (newParentId === node.parentId) return project;
+  if (newParentId === nodeId) return project;
+
+  if (newParentId) {
+    const targetParent = project.nodes[newParentId];
+    if (!targetParent) return project;
+    const descendants = collectDescendants(project, nodeId, new Set<string>());
+    if (descendants.has(newParentId)) {
+      // 避免将节点挂到自己的子树下导致环
+      return project;
+    }
+  }
+
+  const newNodes = { ...project.nodes };
+  let newRootIds = [...project.rootIds];
+
+  if (node.parentId) {
+    const oldParent = newNodes[node.parentId];
+    if (oldParent) {
+      newNodes[node.parentId] = {
+        ...oldParent,
+        children: oldParent.children.filter((id) => id !== nodeId),
+      };
+    }
+  } else {
+    newRootIds = newRootIds.filter((id) => id !== nodeId);
+  }
+
+  const updatedNode: MindMapNode = {
+    ...node,
+    parentId: newParentId,
+    ...(newParentId === null ? { x: node.x ?? 0, y: node.y ?? 0 } : {}),
+  };
+  newNodes[nodeId] = updatedNode;
+
+  if (newParentId) {
+    const parent = newNodes[newParentId];
+    if (!parent) return project;
+    const safePosition = Math.max(0, Math.min(position ?? parent.children.length, parent.children.length));
+    const newChildren = parent.children.filter((id) => id !== nodeId);
+    newChildren.splice(safePosition, 0, nodeId);
+    newNodes[newParentId] = { ...parent, children: newChildren };
+  } else if (!newRootIds.includes(nodeId)) {
+    newRootIds.push(nodeId);
+  }
+
+  return {
+    nodes: newNodes,
+    rootIds: newRootIds,
+  };
+};
+
 // --- Helpers ---
 
 export const getParentId = (project: MindMapProject, nodeId: string): string | null => {
