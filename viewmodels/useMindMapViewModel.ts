@@ -18,6 +18,7 @@ import {
   updateRootPosition,
   reorderChildren,
   getParentId,
+  reparentNode,
   generateNodeId,
   getContextJsonString,
   getFormattedGlobalContextString,
@@ -56,6 +57,7 @@ export interface MindMapViewModel {
   handleMoveRoot: (id: string, x: number, y: number) => void;
   handleReorderChildren: (parentId: string, orderedChildIds: string[]) => void;
   handleCommitReorder: () => void;
+  handleReparentNode: (nodeId: string, newParentId: string | null) => void;
   handleCopyContext: (nodeId: string) => void;
   handleCopyGlobalContext: () => void;
   handleExportJson: () => void;
@@ -295,6 +297,15 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     pushState(latestProjectRef.current);
   }, [pushState]);
 
+  const handleReparentNode = useCallback(
+    (nodeId: string, newParentId: string | null) => {
+      const nextProject = reparentNode(data, nodeId, newParentId);
+      if (nextProject === data) return;
+      pushState(nextProject);
+    },
+    [data, pushState]
+  );
+
   const showNotification = useCallback((message: string, duration = 2000) => {
     setNotification(message);
     setTimeout(() => setNotification(null), duration);
@@ -464,6 +475,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     handleMoveRoot,
     handleReorderChildren,
     handleCommitReorder,
+    handleReparentNode,
     handleCopyContext,
     handleCopyGlobalContext,
     handleExportJson,

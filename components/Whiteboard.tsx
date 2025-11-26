@@ -21,6 +21,7 @@ interface WhiteboardProps {
   onEditEnd: () => void;
   onGenerateAI: (id: string) => void;
   onMoveRoot: (id: string, x: number, y: number) => void;
+  onReparentNode: (id: string, newParentId: string | null) => void;
   onCopyContext: (id: string) => void;
   onReorderChildren: (parentId: string, orderedChildIds: string[]) => void;
   onCommitReorder: () => void;
@@ -40,6 +41,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   onEditEnd,
   onGenerateAI,
   onMoveRoot,
+  onReparentNode,
   onCopyContext,
   onReorderChildren,
   onCommitReorder,
@@ -59,6 +61,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
   const [dragStartMousePos, setDragStartMousePos] = useState({ x: 0, y: 0 });
   const [dragStartNodePos, setDragStartNodePos] = useState<{ x: number; y: number } | null>(null);
   const [dragPreviewOffset, setDragPreviewOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const suppressClickRef = useRef(false);
@@ -113,6 +116,48 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     }
   };
 
+  const getWorldPosition = (clientX: number, clientY: number) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return {
+      x: (clientX - rect.left - viewport.x) / viewport.scale,
+      y: (clientY - rect.top - viewport.y) / viewport.scale,
+    };
+  };
+
+  const isInDraggedSubtree = (candidateId: string, draggedId: string) => {
+    const root = data.nodes[draggedId];
+    if (!root) return false;
+    const stack = [...root.children];
+    while (stack.length) {
+      const current = stack.pop()!;
+      if (current === candidateId) return true;
+      const currentNode = data.nodes[current];
+      if (currentNode) {
+        stack.push(...currentNode.children);
+      }
+    }
+    return false;
+  };
+
+  const findDropTarget = (worldX: number, worldY: number, draggedId: string) => {
+    const draggedNode = data.nodes[draggedId];
+    if (!draggedNode) return null;
+    const padding = 8;
+
+    const candidate = layout.nodes.find((node) => {
+      if (node.id === draggedId) return false;
+      if (node.id === draggedNode.parentId) return false;
+      if (isInDraggedSubtree(node.id, draggedId)) return false;
+
+      const halfW = NODE_WIDTH / 2 + padding;
+      const halfH = nodeHeight / 2 + padding;
+      return Math.abs(worldX - node.x) <= halfW && Math.abs(worldY - node.y) <= halfH;
+    });
+
+    return candidate?.id ?? null;
+  };
+
   const handleNodeMouseDown = (e: React.MouseEvent, nodeId: string) => {
       if (e.button !== 0) return;
       e.preventDefault();
@@ -157,6 +202,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     if (isPanning) {
       setViewport(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
       setDragPreviewOffset({ x: 0, y: 0 });
+      setDropTargetId(null);
     } else if (draggedNodeId && dragMode === 'root') {
         const node = layout.nodes.find(n => n.id === draggedNodeId);
         if (node) {
@@ -202,12 +248,34 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     } else {
         setDragPreviewOffset({ x: 0, y: 0 });
     }
+
+    if (draggedNodeId) {
+      const worldPos = getWorldPosition(e.clientX, e.clientY);
+      if (worldPos) {
+        const targetId = findDropTarget(worldPos.x, worldPos.y, draggedNodeId);
+        setDropTargetId(targetId);
+      }
+    } else if (dropTargetId) {
+      setDropTargetId(null);
+    }
   };
 
-  const handleMouseUp = () => {
-    if (dragMode === 'reorder' && hasSiblingReordered) {
+  const handleMouseUp = (e?: React.MouseEvent) => {
+    const draggedNodeParent = draggedNodeId ? data.nodes[draggedNodeId]?.parentId ?? null : null;
+    let targetId = dropTargetId;
+    if (draggedNodeId && e) {
+      const worldPos = getWorldPosition(e.clientX, e.clientY);
+      if (worldPos) {
+        targetId = findDropTarget(worldPos.x, worldPos.y, draggedNodeId);
+      }
+    }
+
+    if (draggedNodeId && targetId && targetId !== draggedNodeParent) {
+      onReparentNode(draggedNodeId, targetId);
+    } else if (dragMode === 'reorder' && hasSiblingReordered) {
       onCommitReorder();
     }
+
     suppressClickRef.current = hasDragMoved;
     if (hasDragMoved) {
       setTimeout(() => {
@@ -222,6 +290,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
     setHasDragMoved(false);
     setDragStartNodePos(null);
     setDragPreviewOffset({ x: 0, y: 0 });
+    setDropTargetId(null);
   };
 
   // 防止拖拽松手时触发点击选择
@@ -353,6 +422,7 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
               theme={settings.theme}
               orientation={settings.orientation}
               nodeHeight={nodeHeight}
+              isDropTarget={dropTargetId === node.id}
             />
           ))}
         </div>

@@ -22,6 +22,7 @@ interface NodeItemProps {
   isGenerating: boolean;
   isDragging: boolean;
   dragOffset: { x: number; y: number };
+  isDropTarget: boolean;
   theme: Theme;
   orientation: Orientation;
 }
@@ -46,6 +47,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   theme,
   orientation,
   nodeHeight,
+  isDropTarget,
 }) => {
   const [tempContent, setTempContent] = useState(node.content);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -118,6 +120,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   const shadowClass = isDragging
     ? `${baseShadowClass} ring-2 ring-purple-500/30 shadow-purple-500/25`
     : baseShadowClass;
+  const dropHighlightClass = isDropTarget ? 'ring-2 ring-emerald-400 border-emerald-400 shadow-emerald-500/40' : '';
 
   return (
     <div
@@ -153,6 +156,7 @@ export const NodeItem: React.FC<NodeItemProps> = ({
           ${styleConfig.bg} 
           ${borderClass}
           ${shadowClass}
+          ${dropHighlightClass}
         `}
       >
         {/* Header: Full Width Colored Strip */}
