@@ -80,23 +80,30 @@ export const NodeItem: React.FC<NodeItemProps> = ({
   }, [isEditing]);
 
   const handleSave = () => {
-    if (tempContent.trim() !== '') {
-      onUpdateContent(node.id, tempContent);
-    } else {
-      setTempContent(node.content);
-    }
+    // Now just exit edit mode since content is already saved in real-time
     onEditEnd();
   };
 
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setTempContent(newContent);
+    // Real-time update - save immediately as user types
+    if (newContent.trim() !== '') {
+      onUpdateContent(node.id, newContent);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    e.stopPropagation(); 
-    
+    e.stopPropagation();
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSave();
     }
     if (e.key === 'Escape') {
+      // Revert to original content and exit
       setTempContent(node.content);
+      onUpdateContent(node.id, node.content);
       onEditEnd();
     }
   };
@@ -243,11 +250,11 @@ export const NodeItem: React.FC<NodeItemProps> = ({
             <textarea
               ref={inputRef}
               value={tempContent}
-              onChange={(e) => setTempContent(e.target.value)}
+              onChange={handleContentChange}
               onBlur={handleSave}
               onKeyDown={handleKeyDown}
               className={`w-full h-full p-0 text-xs focus:outline-none resize-none bg-transparent ${theme === 'dark' ? 'text-white' : 'text-black'} leading-relaxed font-medium`}
-              onMouseDown={(e) => e.stopPropagation()} 
+              onMouseDown={(e) => e.stopPropagation()}
             />
           ) : (
             <div 

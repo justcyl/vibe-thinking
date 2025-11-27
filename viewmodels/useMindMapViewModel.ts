@@ -297,6 +297,13 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     pushState(latestProjectRef.current);
   }, [pushState]);
 
+  // Initialize history manager with current canvas data on mount
+  useEffect(() => {
+    if (currentCanvas?.data) {
+      loadHistory(currentCanvas.data);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleReparentNode = useCallback(
     (nodeId: string, newParentId: string | null) => {
       const nextProject = reparentNode(data, nodeId, newParentId);
