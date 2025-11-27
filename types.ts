@@ -107,3 +107,12 @@ export interface AgentResponse {
 }
 
 export type NodeSize = 'small' | 'medium' | 'large';
+
+// --- Model Types ---
+export interface ModelOption {
+  id: string;
+  name: string;
+  provider: string;
+}
+
+export type ModelId = 'pz/gpt-5' | 'anthropic/claude-sonnet-4.5';

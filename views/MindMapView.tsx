@@ -80,6 +80,9 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     agentPanelWidth,
     startResizing,
     availableNodes,
+    selectedModel,
+    setSelectedModel,
+    clearConversation,
   } = viewModel;
 
   const topBtnStyle =
@@ -291,6 +294,9 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
               isProcessing={isAgentProcessing}
               theme={viewSettings.theme}
               availableNodes={availableNodes}
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
+              onNewConversation={clearConversation}
             />
             <div
               className="absolute top-0 left-[-4px] bottom-0 w-[8px] cursor-col-resize z-50 hover:bg-blue-500/20 transition-colors flex items-center justify-center group"

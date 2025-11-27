@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType } from '@/types';
+import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType, ModelId } from '@/types';
 import { chatWithAgent } from '@/services/claudeService';
 import { addNode, deleteNode, generateNodeId, serializeForestForAgent, updateNode } from '@/utils/layout';
+import { DEFAULT_MODEL_ID } from '@/constants';
 
 interface UseAgentInterfaceOptions {
   data: MindMapProject;
@@ -19,6 +20,9 @@ interface AgentInterface {
   isAgentProcessing: boolean;
   sendMessage: (text: string) => Promise<void>;
   availableNodes: { id: string; parentId: string | null; type: NodeType; content: string }[];
+  selectedModel: ModelId;
+  setSelectedModel: (model: ModelId) => void;
+  clearConversation: () => void;
 }
 
 const applyOperation = (
@@ -60,6 +64,7 @@ export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgen
   const [isResizingAgent, setIsResizingAgent] = useState(false);
   const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [isAgentProcessing, setIsAgentProcessing] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ModelId>(DEFAULT_MODEL_ID as ModelId);
 
   const availableNodes = useMemo(() => serializeForestForAgent(data), [data]);
 
@@ -93,6 +98,10 @@ export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgen
     setIsResizingAgent(true);
   }, []);
 
+  const clearConversation = useCallback(() => {
+    setMessages([]);
+  }, []);
+
   const sendMessage = useCallback(
     async (text: string) => {
       if (!text.trim()) return;
@@ -105,7 +114,7 @@ export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgen
       setMessages((prev) => [...prev, userMessage]);
       setIsAgentProcessing(true);
       try {
-        const response = await chatWithAgent(text, availableNodes);
+        const response = await chatWithAgent(text, availableNodes, selectedModel);
         if (response.operations && response.operations.length > 0) {
           let nextProject = data;
           let changed = false;
@@ -140,7 +149,7 @@ export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgen
         setIsAgentProcessing(false);
       }
     },
-    [availableNodes, data, pushState, getGlobalNodeIds]
+    [availableNodes, data, pushState, getGlobalNodeIds, selectedModel]
   );
 
   return {
@@ -153,5 +162,8 @@ export const useAgentInterface = ({ data, pushState, getGlobalNodeIds }: UseAgen
     isAgentProcessing,
     sendMessage,
     availableNodes,
+    selectedModel,
+    setSelectedModel,
+    clearConversation,
   };
 };

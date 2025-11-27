@@ -13,8 +13,8 @@ const client = new Anthropic({
   dangerouslyAllowBrowser: true, // Required for browser environment
 });
 
-// const modelName = 'anthropic/claude-sonnet-4.5';
-const modelName = 'pz/gpt-5';
+// Default model - can be overridden per request
+const defaultModelName = 'pz/gpt-5';
 
 
 // Tool definitions for structured output
@@ -161,7 +161,8 @@ You MUST use the respond_with_operations tool to output your response.`;
 export const generateBrainstormIdeas = async (
   parentNodeContent: string,
   parentNodeType: NodeType,
-  contextTrace: string[]
+  contextTrace: string[],
+  modelId?: string
 ): Promise<{ type: NodeType; content: string }[]> => {
 
   if (!apiKey) {
@@ -179,7 +180,7 @@ Generate 3-4 next logical steps following the "Logical Flow Rules".`;
 
   try {
     const response = await client.messages.create({
-      model: modelName,
+      model: modelId || defaultModelName,
       max_tokens: 1024,
       system: systemPromptBrainstorm,
       tools: [brainstormTool],
@@ -221,7 +222,8 @@ Generate 3-4 next logical steps following the "Logical Flow Rules".`;
 
 export const chatWithAgent = async (
   userMessage: string,
-  currentMapData: any[]
+  currentMapData: any[],
+  modelId?: string
 ): Promise<AgentResponse> => {
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY missing");
@@ -235,7 +237,7 @@ User Message:
 
   try {
     const response = await client.messages.create({
-      model: modelName,
+      model: modelId || defaultModelName,
       max_tokens: 2048,
       system: systemPromptAgent,
       tools: [agentResponseTool],

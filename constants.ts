@@ -1,5 +1,5 @@
 
-import { NodeType, MindMapProject, NodeSize } from './types';
+import { NodeType, MindMapProject, NodeSize, ModelOption } from './types';
 import { Lightbulb, Search, Box, AlertCircle, Play, Paperclip, AtSign, File, GripVertical } from 'lucide-react';
 
 // Minimalist Dark Theme with Colored Headers - Updated for vibrancy
@@ -225,3 +225,11 @@ export const AGENT_ICONS = {
     File,
     GripVertical
 };
+
+// --- Model Options ---
+export const MODEL_OPTIONS: ModelOption[] = [
+  { id: 'pz/gpt-5', name: 'GPT-5', provider: 'OpenAI' },
+  { id: 'anthropic/claude-sonnet-4.5', name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+];
+
+export const DEFAULT_MODEL_ID = 'pz/gpt-5';

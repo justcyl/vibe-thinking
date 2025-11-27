@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AgentMessage, Theme, NodeType } from '../types';
-import { Send, Bot, X, Paperclip, File, Trash2, Sparkles } from 'lucide-react';
-import { LABELS, NODE_ICONS } from '../constants';
+import { AgentMessage, Theme, NodeType, ModelId } from '../types';
+import { Send, Bot, X, Paperclip, File, Trash2, Sparkles, Plus, ChevronDown } from 'lucide-react';
+import { LABELS, NODE_ICONS, MODEL_OPTIONS } from '../constants';
 
 interface AgentPanelProps {
   isOpen: boolean;
@@ -12,6 +12,9 @@ interface AgentPanelProps {
   isProcessing: boolean;
   theme: Theme;
   availableNodes: { id: string; type: NodeType; content: string }[];
+  selectedModel: ModelId;
+  onModelChange: (model: ModelId) => void;
+  onNewConversation: () => void;
 }
 
 export const AgentPanel: React.FC<AgentPanelProps> = ({
@@ -21,13 +24,17 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
   onSendMessage,
   isProcessing,
   theme,
-  availableNodes
+  availableNodes,
+  selectedModel,
+  onModelChange,
+  onNewConversation
 }) => {
   const [input, setInput] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionQuery, setSuggestionQuery] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -131,23 +138,73 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
   const textClass = theme === 'dark' ? 'text-[#cccccc]' : 'text-neutral-800';
   const borderClass = theme === 'dark' ? 'border-[#333333]' : 'border-neutral-200';
   const footerBg = theme === 'dark' ? 'bg-[#1e1e1e]' : 'bg-white';
+  const dropdownBg = theme === 'dark' ? 'bg-[#252526]' : 'bg-white';
+  const dropdownHover = theme === 'dark' ? 'hover:bg-[#2a2d2e]' : 'hover:bg-neutral-100';
   
   // Bubbles - Removed chat style, using log style
   const userMsgClass = theme === 'dark' ? 'text-[#9cdcfe] bg-[#252526]' : 'text-blue-800 bg-blue-50';
   const botMsgClass = theme === 'dark' ? 'text-[#d4d4d4]' : 'text-neutral-900';
 
+  const selectedModelInfo = MODEL_OPTIONS.find(m => m.id === selectedModel) || MODEL_OPTIONS[0];
+
   return (
     <div className={`h-full flex flex-col overflow-hidden font-mono text-xs ${bgClass} ${textClass}`} style={{ width: '100%' }}>
-      
-      {/* Header - Minimal */}
-      <div className={`h-10 flex items-center justify-between px-4 border-b flex-shrink-0 ${borderClass} bg-opacity-50`}>
-        <div className="flex items-center gap-2 opacity-70">
-          <Bot size={14} />
-          <span className="font-bold uppercase tracking-wider">{LABELS.agentTitle}</span>
+
+      {/* Header - With Model Selector and New Chat */}
+      <div className={`h-10 flex items-center justify-between px-3 border-b flex-shrink-0 ${borderClass} bg-opacity-50`}>
+        <div className="flex items-center gap-2">
+          {/* Model Selector Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowModelDropdown(!showModelDropdown)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
+            >
+              <Bot size={12} />
+              <span className="font-medium">{selectedModelInfo.name}</span>
+              <ChevronDown size={10} className={`transition-transform ${showModelDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showModelDropdown && (
+              <div className={`absolute top-full left-0 mt-1 min-w-[180px] border shadow-lg z-50 ${dropdownBg} ${borderClass}`}>
+                {MODEL_OPTIONS.map(model => (
+                  <button
+                    key={model.id}
+                    onClick={() => {
+                      onModelChange(model.id as ModelId);
+                      setShowModelDropdown(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left ${dropdownHover} ${
+                      model.id === selectedModel ? (theme === 'dark' ? 'bg-white/5' : 'bg-black/5') : ''
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium">{model.name}</span>
+                      <span className="text-[9px] opacity-50">{model.provider}</span>
+                    </div>
+                    {model.id === selectedModel && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <button onClick={onClose} className={`p-1 hover:bg-white/10 rounded transition-colors`}>
-          <X size={14} />
-        </button>
+
+        <div className="flex items-center gap-1">
+          {/* New Conversation Button */}
+          <button
+            onClick={onNewConversation}
+            className={`p-1.5 rounded transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
+            title="新建对话"
+          >
+            <Plus size={14} />
+          </button>
+          {/* Close Button */}
+          <button onClick={onClose} className={`p-1.5 rounded transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}>
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Messages Log */}

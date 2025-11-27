@@ -9,6 +9,7 @@ import {
   AgentMessage,
   Theme,
   Orientation,
+  ModelId,
 } from '@/types';
 import {
   addNode,
@@ -89,6 +90,9 @@ export interface MindMapViewModel {
   isAgentProcessing: boolean;
   sendAgentMessage: ReturnType<typeof useAgentInterface>['sendMessage'];
   availableNodes: ReturnType<typeof useAgentInterface>['availableNodes'];
+  selectedModel: ModelId;
+  setSelectedModel: (model: ModelId) => void;
+  clearConversation: () => void;
 }
 
 const getNextLogicalType = (parentType: NodeType): NodeType => {
@@ -176,6 +180,9 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     isAgentProcessing,
     sendMessage,
     availableNodes,
+    selectedModel,
+    setSelectedModel,
+    clearConversation,
   } = useAgentInterface({ data, pushState, getGlobalNodeIds });
 
   const latestProjectRef = useRef<MindMapProject>(data);
@@ -513,5 +520,8 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     isAgentProcessing,
     sendAgentMessage: sendMessage,
     availableNodes,
+    selectedModel,
+    setSelectedModel,
+    clearConversation,
   };
 };
