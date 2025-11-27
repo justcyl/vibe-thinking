@@ -24,7 +24,7 @@ import {
   getFormattedGlobalContextString,
   serializeProjectForExport,
 } from '@/utils/layout';
-import { generateBrainstormIdeas } from '@/services/geminiService';
+import { generateBrainstormIdeas } from '@/services/claudeService';
 import { useCanvasManager } from '@/hooks/useCanvasManager';
 import { useHistoryManager } from '@/hooks/useHistoryManager';
 import { useAgentInterface } from '@/hooks/useAgentInterface';

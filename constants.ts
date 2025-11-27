@@ -199,7 +199,7 @@ export const LABELS = {
   addFloating: "添加节点",
   resetView: "重置",
   noIdeas: "未生成想法，请尝试理清父节点内容。",
-  failedConnect: "连接 Gemini 失败。",
+  failedConnect: "连接 AI 服务失败。",
   undo: "撤销",
   redo: "重做",
   copyContext: "复制上下文",

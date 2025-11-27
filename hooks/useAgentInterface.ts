@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType } from '@/types';
-import { chatWithAgent } from '@/services/geminiService';
+import { chatWithAgent } from '@/services/claudeService';
 import { addNode, deleteNode, generateNodeId, serializeForestForAgent, updateNode } from '@/utils/layout';
 
 interface UseAgentInterfaceOptions {
