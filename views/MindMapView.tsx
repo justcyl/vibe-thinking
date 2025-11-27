@@ -82,7 +82,13 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     availableNodes,
     selectedModel,
     setSelectedModel,
-    clearConversation,
+    currentConversation,
+    conversations,
+    newConversation,
+    selectConversation,
+    deleteConversation,
+    showHistory,
+    setShowHistory,
   } = viewModel;
 
   const topBtnStyle =
@@ -296,7 +302,13 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
               availableNodes={availableNodes}
               selectedModel={selectedModel}
               onModelChange={setSelectedModel}
-              onNewConversation={clearConversation}
+              currentConversation={currentConversation}
+              conversations={conversations}
+              onNewConversation={newConversation}
+              onSelectConversation={selectConversation}
+              onDeleteConversation={deleteConversation}
+              showHistory={showHistory}
+              onShowHistoryChange={setShowHistory}
             />
             <div
               className="absolute top-0 left-[-4px] bottom-0 w-[8px] cursor-col-resize z-50 hover:bg-blue-500/20 transition-colors flex items-center justify-center group"

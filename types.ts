@@ -116,3 +116,14 @@ export interface ModelOption {
 }
 
 export type ModelId = 'pz/gpt-5' | 'anthropic/claude-sonnet-4.5';
+
+// --- Conversation Types ---
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: AgentMessage[];
+  canvasId: string;      // 绑定的画布 ID
+  canvasName: string;    // 绑定的画布名称（创建时快照）
+  createdAt: number;
+  updatedAt: number;
+}

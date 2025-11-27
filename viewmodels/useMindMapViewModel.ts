@@ -10,6 +10,7 @@ import {
   Theme,
   Orientation,
   ModelId,
+  Conversation,
 } from '@/types';
 import {
   addNode,
@@ -92,7 +93,14 @@ export interface MindMapViewModel {
   availableNodes: ReturnType<typeof useAgentInterface>['availableNodes'];
   selectedModel: ModelId;
   setSelectedModel: (model: ModelId) => void;
-  clearConversation: () => void;
+  // 对话管理
+  currentConversation: Conversation | null;
+  conversations: Conversation[];
+  newConversation: () => void;
+  selectConversation: (id: string) => void;
+  deleteConversation: (id: string) => void;
+  showHistory: boolean;
+  setShowHistory: (show: boolean) => void;
 }
 
 const getNextLogicalType = (parentType: NodeType): NodeType => {
@@ -182,8 +190,20 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     availableNodes,
     selectedModel,
     setSelectedModel,
-    clearConversation,
-  } = useAgentInterface({ data, pushState, getGlobalNodeIds });
+    currentConversation,
+    conversations,
+    newConversation,
+    selectConversation,
+    deleteConversation,
+    showHistory,
+    setShowHistory,
+  } = useAgentInterface({
+    data,
+    pushState,
+    getGlobalNodeIds,
+    currentCanvasId,
+    currentCanvasName: currentCanvas?.name || '',
+  });
 
   const latestProjectRef = useRef<MindMapProject>(data);
 
@@ -522,6 +542,12 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     availableNodes,
     selectedModel,
     setSelectedModel,
-    clearConversation,
+    currentConversation,
+    conversations,
+    newConversation,
+    selectConversation,
+    deleteConversation,
+    showHistory,
+    setShowHistory,
   };
 };
