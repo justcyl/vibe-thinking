@@ -153,11 +153,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
               <div
                 className={`h-10 px-4 rounded-full flex items-center gap-3 shadow-lg border ${viewSettings.theme === 'dark' ? 'bg-[#18181b] border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-800'}`}
               >
-                <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-purple-500" />
-                  <span className="font-bold tracking-tight text-sm">Vibe-Thinking</span>
-                </div>
-                <div className="h-4 w-px bg-neutral-700/50 mx-1" />
+                <Sparkles size={14} className="text-purple-500" />
+                <div className="h-4 w-px bg-neutral-700/50" />
                 <div className="min-w-[80px]" onDoubleClick={() => startRename(currentCanvasId, 'header')}>
                   {editingCanvasId === currentCanvasId && editSource === 'header' ? (
                     <input
