@@ -138,7 +138,8 @@ export const useAgentInterface = ({
     if (!isResizingAgent) return;
 
     const handleMouseMove = (event: MouseEvent) => {
-      const newWidth = Math.max(250, Math.min(event.clientX, 600));
+      // Calculate width from right edge of window
+      const newWidth = Math.max(250, Math.min(window.innerWidth - event.clientX, 600));
       setAgentPanelWidth(newWidth);
     };
 
