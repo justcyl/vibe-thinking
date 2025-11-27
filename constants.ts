@@ -228,8 +228,8 @@ export const AGENT_ICONS = {
 
 // --- Model Options ---
 export const MODEL_OPTIONS: ModelOption[] = [
-  { id: 'pz/gpt-5', name: 'GPT-5', provider: 'OpenAI' },
-  { id: 'anthropic/claude-sonnet-4.5', name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+  { id: 'gpt-5.1', name: 'GPT-5.1', provider: 'OpenAI' },
+  { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
 ];
 
-export const DEFAULT_MODEL_ID = 'pz/gpt-5';
+export const DEFAULT_MODEL_ID = 'gpt-5.1';

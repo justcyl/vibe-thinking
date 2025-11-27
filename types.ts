@@ -140,7 +140,7 @@ export interface ModelOption {
   provider: string;
 }
 
-export type ModelId = 'pz/gpt-5' | 'anthropic/claude-sonnet-4.5';
+export type ModelId = 'gpt-5.1' | 'claude-sonnet-4-5';
 
 // --- Conversation Types ---
 export interface Conversation {
