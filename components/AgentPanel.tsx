@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AgentMessage, Theme, NodeType, ModelId, Conversation } from '../types';
-import { Send, Bot, X, Paperclip, File, Plus, ChevronDown, History, Layout, Trash2, MessageSquare } from 'lucide-react';
+import { AgentMessage, Theme, NodeType, ModelId, Conversation, ToolCall } from '../types';
+import { Send, Bot, X, Paperclip, File, Plus, ChevronDown, History, Layout, Trash2, MessageSquare, Wrench, Check, Loader2, AlertCircle, PlusCircle, Edit3, Trash } from 'lucide-react';
 import { LABELS, MODEL_OPTIONS } from '../constants';
 
 interface AgentPanelProps {
@@ -22,7 +22,108 @@ interface AgentPanelProps {
   onDeleteConversation: (id: string) => void;
   showHistory: boolean;
   onShowHistoryChange: (show: boolean) => void;
+  // 工具调用状态
+  pendingToolCalls: ToolCall[];
+  // 流式文本
+  streamingText: string;
 }
+
+// 工具名称映射
+const TOOL_NAMES: Record<string, string> = {
+  'add_node': '添加节点',
+  'update_node': '更新节点',
+  'delete_node': '删除节点',
+};
+
+// 工具图标映射
+const TOOL_ICONS: Record<string, React.ReactNode> = {
+  'add_node': <PlusCircle size={12} />,
+  'update_node': <Edit3 size={12} />,
+  'delete_node': <Trash size={12} />,
+};
+
+// 工具调用状态颜色
+const STATUS_COLORS: Record<string, string> = {
+  'pending': 'text-yellow-500',
+  'running': 'text-blue-500',
+  'completed': 'text-green-500',
+  'error': 'text-red-500',
+};
+
+// 工具调用卡片组件
+const ToolCallCard: React.FC<{ toolCall: ToolCall; theme: Theme }> = ({ toolCall, theme }) => {
+  const bgClass = theme === 'dark' ? 'bg-[#2d2d2d]' : 'bg-neutral-100';
+  const borderClass = theme === 'dark' ? 'border-[#404040]' : 'border-neutral-200';
+
+  const getStatusIcon = () => {
+    switch (toolCall.status) {
+      case 'pending':
+        return <Loader2 size={12} className="animate-spin text-yellow-500" />;
+      case 'running':
+        return <Loader2 size={12} className="animate-spin text-blue-500" />;
+      case 'completed':
+        return <Check size={12} className="text-green-500" />;
+      case 'error':
+        return <AlertCircle size={12} className="text-red-500" />;
+    }
+  };
+
+  const formatArguments = (args: Record<string, unknown>) => {
+    const entries = Object.entries(args);
+    return entries.map(([key, value]) => (
+      <div key={key} className="flex gap-2">
+        <span className="opacity-50">{key}:</span>
+        <span className="truncate">{String(value)}</span>
+      </div>
+    ));
+  };
+
+  return (
+    <div className={`rounded border ${bgClass} ${borderClass} overflow-hidden`}>
+      {/* 头部 */}
+      <div className={`flex items-center gap-2 px-2 py-1.5 ${theme === 'dark' ? 'bg-[#252526]' : 'bg-neutral-50'}`}>
+        <span className="opacity-60">{TOOL_ICONS[toolCall.name] || <Wrench size={12} />}</span>
+        <span className="font-medium flex-1">{TOOL_NAMES[toolCall.name] || toolCall.name}</span>
+        {getStatusIcon()}
+      </div>
+      {/* 参数 */}
+      <div className="px-2 py-1.5 text-[10px] opacity-70 space-y-0.5">
+        {formatArguments(toolCall.arguments)}
+      </div>
+    </div>
+  );
+};
+
+// 消息中的工具调用展示组件
+const MessageToolCalls: React.FC<{ toolCalls: ToolCall[]; theme: Theme }> = ({ toolCalls, theme }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!toolCalls || toolCalls.length === 0) return null;
+
+  const bgClass = theme === 'dark' ? 'bg-[#1a1a1a]' : 'bg-neutral-50';
+  const borderClass = theme === 'dark' ? 'border-[#333]' : 'border-neutral-200';
+
+  return (
+    <div className={`mt-2 rounded border ${bgClass} ${borderClass} overflow-hidden`}>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`w-full flex items-center gap-2 px-2 py-1.5 text-[10px] ${theme === 'dark' ? 'hover:bg-[#252526]' : 'hover:bg-neutral-100'}`}
+      >
+        <Wrench size={10} className="opacity-50" />
+        <span className="opacity-70">调用了 {toolCalls.length} 个工具</span>
+        <ChevronDown size={10} className={`ml-auto opacity-50 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isExpanded && (
+        <div className={`px-2 py-2 space-y-2 border-t ${borderClass}`}>
+          {toolCalls.map(tc => (
+            <ToolCallCard key={tc.id} toolCall={tc} theme={theme} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const AgentPanel: React.FC<AgentPanelProps> = ({
   isOpen,
@@ -40,7 +141,9 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
   onSelectConversation,
   onDeleteConversation,
   showHistory,
-  onShowHistoryChange
+  onShowHistoryChange,
+  pendingToolCalls,
+  streamingText
 }) => {
   const [input, setInput] = useState('');
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -57,7 +160,7 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, pendingToolCalls]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -308,14 +411,51 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
                  <div className={`whitespace-pre-wrap leading-relaxed p-2 ${msg.role === 'user' ? `${userMsgClass} border border-transparent` : `${botMsgClass}`}`}>
                    {msg.content}
                  </div>
+
+                 {/* 显示助手消息的工具调用记录 */}
+                 {msg.role === 'assistant' && msg.toolCalls && msg.toolCalls.length > 0 && (
+                   <MessageToolCalls toolCalls={msg.toolCalls} theme={theme} />
+                 )}
               </div>
             ))}
 
+            {/* 正在处理时显示实时工具调用状态和流式文本 */}
             {isProcessing && (
-               <div className="flex items-center gap-2 opacity-50 mt-2">
-                   <div className="w-1.5 h-1.5 bg-current animate-pulse" />
-                   <span className="text-[10px] uppercase">Processing...</span>
-               </div>
+              <div className="space-y-3">
+                {/* 流式文本显示 */}
+                {streamingText && (
+                  <div className="flex flex-col gap-1">
+                    <div className="text-[10px] uppercase tracking-widest opacity-40 mb-0.5">
+                      ASSISTANT
+                    </div>
+                    <div className={`whitespace-pre-wrap leading-relaxed p-2 ${botMsgClass}`}>
+                      {streamingText}
+                      <span className="inline-block w-2 h-4 bg-current animate-pulse ml-0.5" />
+                    </div>
+                  </div>
+                )}
+
+                {/* 工具调用状态 */}
+                {pendingToolCalls.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-[10px] uppercase tracking-widest opacity-40 flex items-center gap-2">
+                      <Wrench size={10} />
+                      <span>正在执行工具...</span>
+                    </div>
+                    {pendingToolCalls.map(tc => (
+                      <ToolCallCard key={tc.id} toolCall={tc} theme={theme} />
+                    ))}
+                  </div>
+                )}
+
+                {/* 没有流式文本时显示加载状态 */}
+                {!streamingText && pendingToolCalls.length === 0 && (
+                  <div className="flex items-center gap-2 opacity-50">
+                    <Loader2 size={12} className="animate-spin" />
+                    <span className="text-[10px] uppercase">Processing...</span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

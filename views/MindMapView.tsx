@@ -89,6 +89,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     deleteConversation,
     showHistory,
     setShowHistory,
+    pendingToolCalls,
+    streamingText,
   } = viewModel;
 
   const topBtnStyle =
@@ -323,6 +325,8 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
               onDeleteConversation={deleteConversation}
               showHistory={showHistory}
               onShowHistoryChange={setShowHistory}
+              pendingToolCalls={pendingToolCalls}
+              streamingText={streamingText}
             />
           </div>
         )}

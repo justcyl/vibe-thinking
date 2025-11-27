@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType, ModelId, Conversation } from '@/types';
-import { chatWithAgent } from '@/services/claudeService';
+import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType, ModelId, Conversation, ToolCall, StreamEvent } from '@/types';
+import { chatWithAgentStream } from '@/services/claudeService';
 import { addNode, deleteNode, generateNodeId, serializeForestForAgent, updateNode } from '@/utils/layout';
 import { DEFAULT_MODEL_ID } from '@/constants';
 
@@ -33,6 +33,10 @@ interface AgentInterface {
   deleteConversation: (id: string) => void;
   showHistory: boolean;
   setShowHistory: (show: boolean) => void;
+  // 工具调用状态
+  pendingToolCalls: ToolCall[];
+  // 流式文本
+  streamingText: string;
 }
 
 const applyOperation = (
@@ -73,6 +77,7 @@ const STORAGE_KEY = 'vibe-thinking-conversations';
  * - 每个对话绑定一个画布作为上下文
  * - 画布内容实时更新到上下文
  * - 对话历史持久化到 localStorage
+ * - 支持流式工具调用状态追踪
  */
 export const useAgentInterface = ({
   data,
@@ -86,6 +91,11 @@ export const useAgentInterface = ({
   const [isResizingAgent, setIsResizingAgent] = useState(false);
   const [isAgentProcessing, setIsAgentProcessing] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelId>(DEFAULT_MODEL_ID as ModelId);
+
+  // 工具调用状态
+  const [pendingToolCalls, setPendingToolCalls] = useState<ToolCall[]>([]);
+  // 流式文本状态
+  const [streamingText, setStreamingText] = useState('');
 
   // 对话管理 - 从 localStorage 初始化
   const [conversations, setConversations] = useState<Conversation[]>(() => {
@@ -205,6 +215,10 @@ export const useAgentInterface = ({
     async (text: string) => {
       if (!text.trim()) return;
 
+      // 清空之前的状态
+      setPendingToolCalls([]);
+      setStreamingText('');
+
       // 如果没有当前对话，先创建一个
       let convId = currentConversationId;
       if (!convId) {
@@ -233,18 +247,50 @@ export const useAgentInterface = ({
       updateConversationMessages(convId, (msgs) => [...msgs, userMessage]);
       setIsAgentProcessing(true);
 
+      // 用于追踪当前数据状态（因为操作可能需要在流式过程中应用）
+      let currentProject = data;
+      const usedIds = getGlobalNodeIds();
+
       try {
-        const response = await chatWithAgent(text, availableNodes, selectedModel);
+        // 处理流式事件
+        const handleStreamEvent = (event: StreamEvent) => {
+          switch (event.type) {
+            case 'text_delta':
+              setStreamingText(prev => prev + event.text);
+              break;
+
+            case 'tool_start':
+              setPendingToolCalls(prev => [...prev, event.toolCall]);
+              break;
+
+            case 'tool_end':
+              setPendingToolCalls(prev =>
+                prev.map(tc => tc.id === event.toolCall.id ? event.toolCall : tc)
+              );
+              break;
+
+            case 'error':
+              console.error('Stream error:', event.error);
+              break;
+          }
+        };
+
+        const response = await chatWithAgentStream(
+          text,
+          availableNodes,
+          selectedModel,
+          handleStreamEvent
+        );
+
+        // 应用所有操作到画布
         if (response.operations && response.operations.length > 0) {
-          let nextProject = data;
           let changed = false;
-          const usedIds = getGlobalNodeIds();
           response.operations.forEach((operation) => {
-            const result = applyOperation(nextProject, operation, usedIds);
-            nextProject = result.next;
+            const result = applyOperation(currentProject, operation, usedIds);
+            currentProject = result.next;
             changed = changed || result.changed;
           });
-          if (changed) pushState(nextProject);
+          if (changed) pushState(currentProject);
         }
 
         const assistantMessage: AgentMessage = {
@@ -252,6 +298,8 @@ export const useAgentInterface = ({
           role: 'assistant',
           content: response.reply,
           timestamp: Date.now(),
+          // 保存工具调用记录
+          toolCalls: response.toolCalls,
         };
         updateConversationMessages(convId, (msgs) => [...msgs, assistantMessage]);
       } catch (error) {
@@ -264,6 +312,9 @@ export const useAgentInterface = ({
         updateConversationMessages(convId, (msgs) => [...msgs, errorMessage]);
       } finally {
         setIsAgentProcessing(false);
+        // 清空流式状态
+        setPendingToolCalls([]);
+        setStreamingText('');
       }
     },
     [availableNodes, data, pushState, getGlobalNodeIds, selectedModel, currentConversationId, currentCanvasId, currentCanvasName, updateConversationMessages]
@@ -288,5 +339,7 @@ export const useAgentInterface = ({
     deleteConversation,
     showHistory,
     setShowHistory,
+    pendingToolCalls,
+    streamingText,
   };
 };

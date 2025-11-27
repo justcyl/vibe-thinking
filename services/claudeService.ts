@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { NodeType, AgentResponse } from '../types';
+import { NodeType, AgentResponse, ToolCall, StreamEvent } from '../types';
 
 const apiKey = process.env.ANTHROPIC_API_KEY || '';
 const baseURL = process.env.ANTHROPIC_API_BASE || undefined;
@@ -48,52 +48,67 @@ const brainstormTool: Anthropic.Tool = {
   }
 };
 
-const agentResponseTool: Anthropic.Tool = {
-  name: 'respond_with_operations',
-  description: 'Respond to the user and optionally perform operations on the mind map',
+// 独立的画布操作工具
+const addNodeTool: Anthropic.Tool = {
+  name: 'add_node',
+  description: 'Add a new child node to an existing node in the mind map',
   input_schema: {
     type: 'object' as const,
     properties: {
-      reply: {
+      parent_id: {
         type: 'string',
-        description: 'Conversational response to the user (in Simplified Chinese)'
+        description: 'The ID of the parent node to add the child to'
       },
-      operations: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            action: {
-              type: 'string',
-              enum: ['ADD_CHILD', 'UPDATE_CONTENT', 'DELETE_NODE'],
-              description: 'The type of operation'
-            },
-            parentId: {
-              type: 'string',
-              description: 'Parent node ID (for ADD_CHILD)'
-            },
-            nodeId: {
-              type: 'string',
-              description: 'Target node ID (for UPDATE_CONTENT, DELETE_NODE)'
-            },
-            nodeType: {
-              type: 'string',
-              enum: ['topic', 'problem', 'hypothesis', 'action', 'evidence'],
-              description: 'Type of the new node (for ADD_CHILD)'
-            },
-            content: {
-              type: 'string',
-              description: 'Content for the node (for ADD_CHILD, UPDATE_CONTENT)'
-            }
-          },
-          required: ['action']
-        },
-        description: 'Array of operations to perform on the mind map'
+      node_type: {
+        type: 'string',
+        enum: ['topic', 'problem', 'hypothesis', 'action', 'evidence'],
+        description: 'The type of the new node'
+      },
+      content: {
+        type: 'string',
+        description: 'The content of the new node (in Simplified Chinese)'
       }
     },
-    required: ['reply', 'operations']
+    required: ['parent_id', 'node_type', 'content']
   }
 };
+
+const updateNodeTool: Anthropic.Tool = {
+  name: 'update_node',
+  description: 'Update the content of an existing node in the mind map',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      node_id: {
+        type: 'string',
+        description: 'The ID of the node to update'
+      },
+      content: {
+        type: 'string',
+        description: 'The new content for the node (in Simplified Chinese)'
+      }
+    },
+    required: ['node_id', 'content']
+  }
+};
+
+const deleteNodeTool: Anthropic.Tool = {
+  name: 'delete_node',
+  description: 'Delete a node and all its descendants from the mind map',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      node_id: {
+        type: 'string',
+        description: 'The ID of the node to delete'
+      }
+    },
+    required: ['node_id']
+  }
+};
+
+// Agent 工具列表
+const agentTools: Anthropic.Tool[] = [addNodeTool, updateNodeTool, deleteNodeTool];
 
 const systemPromptBrainstorm = `You are a rigorous logical thinking assistant using a specific 5-stage thought framework.
 All output must be in Simplified Chinese.
@@ -136,27 +151,22 @@ Logical Flow Rules:
 Keep content concise (under 20 words).
 You MUST use the generate_nodes tool to output your response.`;
 
-const systemPromptAgent = `You are a Mind Map Assistant (思维助理). You can converse with the user and also MODIFY the mind map directly.
+const systemPromptAgent = `You are a Mind Map Assistant (思维助理). You can converse with the user and also MODIFY the mind map directly using tools.
 
 You have access to the current state of the mind map (Nodes with IDs, Types, Content).
 
-Your Capabilities:
-1. Answer questions based on the mind map context.
-2. Suggest improvements.
-3. Execute operations to ADD, UPDATE, or DELETE nodes.
+Your Available Tools:
+1. add_node: Add a new child node to an existing node. Use "type" rules (Topic -> Problem -> Hypothesis -> Action -> Evidence).
+2. update_node: Update the content of an existing node.
+3. delete_node: Delete an existing node and all its descendants.
 
-Operations Types:
-1. ADD_CHILD: Add a new child node to a parent. Use "type" rules (Topic -> Problem -> Hypothesis -> Action -> Evidence).
-2. UPDATE_CONTENT: Update the content of an existing node.
-3. DELETE_NODE: Delete an existing node.
-
-Constraint:
-- Only perform operations if the user explicitly asks for changes or if it adds significant value.
-- If just chatting, return empty operations array.
+Guidelines:
+- Only use tools if the user explicitly asks for changes or if it adds significant value.
+- If just chatting or answering questions, don't use any tools.
 - Refer to nodes by their exact IDs provided in the context.
 - CRITICAL: DO NOT repeat or echo the input mind map data in your response.
-
-You MUST use the respond_with_operations tool to output your response.`;
+- You can call multiple tools in sequence if needed.
+- Always respond in Simplified Chinese.`;
 
 export const generateBrainstormIdeas = async (
   parentNodeContent: string,
@@ -218,16 +228,28 @@ Generate 3-4 next logical steps following the "Logical Flow Rules".`;
   }
 };
 
-// --- Agent Interaction ---
+// --- Streaming Agent Interaction ---
 
-export const chatWithAgent = async (
+interface ToolResult {
+  tool_use_id: string;
+  content: string;
+}
+
+/**
+ * 非流式 Agent 交互 - 支持多轮工具调用
+ * 使用非流式 API 以兼容更多 API 代理
+ */
+export const chatWithAgentStream = async (
   userMessage: string,
   currentMapData: any[],
-  modelId?: string
+  modelId?: string,
+  onEvent?: (event: StreamEvent) => void
 ): Promise<AgentResponse> => {
   if (!apiKey) {
     throw new Error("ANTHROPIC_API_KEY missing");
   }
+
+  const emit = onEvent || (() => {});
 
   const userPrompt = `Current Mind Map State (Flat List):
 ${JSON.stringify(currentMapData, null, 2)}
@@ -235,42 +257,136 @@ ${JSON.stringify(currentMapData, null, 2)}
 User Message:
 "${userMessage}"`;
 
+  const messages: Anthropic.MessageParam[] = [
+    { role: 'user', content: userPrompt }
+  ];
+
+  const allToolCalls: ToolCall[] = [];
+  const allOperations: AgentResponse['operations'] = [];
+  let finalReply = '';
+
   try {
-    const response = await client.messages.create({
-      model: modelId || defaultModelName,
-      max_tokens: 2048,
-      system: systemPromptAgent,
-      tools: [agentResponseTool],
-      tool_choice: { type: 'tool', name: 'respond_with_operations' },
-      messages: [
-        { role: 'user', content: userPrompt }
-      ]
-    });
+    // 多轮工具调用循环
+    let continueLoop = true;
+    while (continueLoop) {
+      const response = await client.messages.create({
+        model: modelId || defaultModelName,
+        max_tokens: 2048,
+        system: systemPromptAgent,
+        tools: agentTools,
+        messages
+      });
 
-    // Extract tool use result
-    const toolUseBlock = response.content.find(
-      (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
-    );
+      const toolResults: ToolResult[] = [];
 
-    if (!toolUseBlock || toolUseBlock.name !== 'respond_with_operations') {
-      return {
-        reply: "抱歉，我在处理您的请求时遇到了问题。请重试。",
-        operations: []
-      };
+      // 处理响应内容
+      for (const block of response.content) {
+        if (block.type === 'text') {
+          finalReply += block.text;
+          // 发送文本事件
+          emit({ type: 'text_delta', text: block.text });
+        } else if (block.type === 'tool_use') {
+          // 创建工具调用记录
+          const toolCall: ToolCall = {
+            id: block.id,
+            name: block.name,
+            arguments: block.input as Record<string, unknown>,
+            status: 'running'
+          };
+
+          // 通知 UI 工具开始执行
+          emit({ type: 'tool_start', toolCall: { ...toolCall } });
+
+          // 将工具调用转换为操作
+          const input = block.input as Record<string, unknown>;
+          let result = '';
+
+          if (block.name === 'add_node') {
+            const operation = {
+              action: 'ADD_CHILD' as const,
+              parentId: input.parent_id as string,
+              nodeType: input.node_type as NodeType,
+              content: input.content as string
+            };
+            allOperations.push(operation);
+            result = `Added node "${input.content}" under parent ${input.parent_id}`;
+            toolCall.result = { success: true, operation };
+          } else if (block.name === 'update_node') {
+            const operation = {
+              action: 'UPDATE_CONTENT' as const,
+              nodeId: input.node_id as string,
+              content: input.content as string
+            };
+            allOperations.push(operation);
+            result = `Updated node ${input.node_id} with content "${input.content}"`;
+            toolCall.result = { success: true, operation };
+          } else if (block.name === 'delete_node') {
+            const operation = {
+              action: 'DELETE_NODE' as const,
+              nodeId: input.node_id as string
+            };
+            allOperations.push(operation);
+            result = `Deleted node ${input.node_id}`;
+            toolCall.result = { success: true, operation };
+          }
+
+          toolCall.status = 'completed';
+          allToolCalls.push(toolCall);
+
+          // 通知 UI 工具执行完成
+          emit({ type: 'tool_end', toolCall: { ...toolCall } });
+
+          toolResults.push({
+            tool_use_id: block.id,
+            content: result
+          });
+        }
+      }
+
+      // 如果有工具调用，添加助手消息和工具结果，继续循环
+      if (toolResults.length > 0) {
+        messages.push({
+          role: 'assistant',
+          content: response.content
+        });
+        messages.push({
+          role: 'user',
+          content: toolResults.map(r => ({
+            type: 'tool_result' as const,
+            tool_use_id: r.tool_use_id,
+            content: r.content
+          }))
+        });
+      }
+
+      // 检查是否需要继续循环
+      if (response.stop_reason === 'end_turn' || toolResults.length === 0) {
+        continueLoop = false;
+      }
     }
 
-    const input = toolUseBlock.input as AgentResponse;
-
-    return {
-      reply: input.reply || "已处理您的请求。",
-      operations: input.operations || []
+    const agentResponse: AgentResponse = {
+      reply: finalReply || "已处理您的请求。",
+      operations: allOperations,
+      toolCalls: allToolCalls
     };
+
+    emit({ type: 'done', response: agentResponse });
+
+    return agentResponse;
 
   } catch (error) {
     console.error("Agent Error:", error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    emit({ type: 'error', error: errorMsg });
+
     return {
       reply: "抱歉，我在处理您的请求时遇到了问题。请尝试减少思维导图的大小或重试。",
-      operations: []
+      operations: [],
+      toolCalls: []
     };
   }
 };
+
+// 保留旧的 API 名称作为别名
+export const chatWithAgent = chatWithAgentStream;

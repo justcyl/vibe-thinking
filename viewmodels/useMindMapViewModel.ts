@@ -11,6 +11,7 @@ import {
   Orientation,
   ModelId,
   Conversation,
+  ToolCall,
 } from '@/types';
 import {
   addNode,
@@ -101,6 +102,10 @@ export interface MindMapViewModel {
   deleteConversation: (id: string) => void;
   showHistory: boolean;
   setShowHistory: (show: boolean) => void;
+  // 工具调用状态
+  pendingToolCalls: ToolCall[];
+  // 流式文本
+  streamingText: string;
 }
 
 const getNextLogicalType = (parentType: NodeType): NodeType => {
@@ -197,6 +202,8 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     deleteConversation,
     showHistory,
     setShowHistory,
+    pendingToolCalls,
+    streamingText,
   } = useAgentInterface({
     data,
     pushState,
@@ -531,6 +538,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     setTempCanvasName,
     startRename,
     saveRename,
+    getCurrentCanvasId,
     isAgentOpen,
     toggleAgent,
     closeAgent,
@@ -549,5 +557,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     deleteConversation,
     showHistory,
     setShowHistory,
+    pendingToolCalls,
+    streamingText,
   };
 };

@@ -82,11 +82,26 @@ export interface Canvas {
 
 export type AgentRole = 'user' | 'assistant' | 'system';
 
+// 工具调用状态
+export type ToolCallStatus = 'pending' | 'running' | 'completed' | 'error';
+
+// 工具调用记录
+export interface ToolCall {
+  id: string;
+  name: string;           // 工具名称: add_node, update_node, delete_node
+  arguments: Record<string, unknown>;  // 工具参数
+  status: ToolCallStatus;
+  result?: unknown;       // 工具执行结果
+  error?: string;         // 错误信息
+}
+
 export interface AgentMessage {
   id: string;
   role: AgentRole;
   content: string;
   timestamp: number;
+  // 助手消息可能包含工具调用
+  toolCalls?: ToolCall[];
 }
 
 export type AgentOperationType = 'ADD_CHILD' | 'UPDATE_CONTENT' | 'DELETE_NODE';
@@ -104,7 +119,17 @@ export interface AgentOperation {
 export interface AgentResponse {
   reply: string;
   operations: AgentOperation[];
+  // 新增：工具调用记录
+  toolCalls?: ToolCall[];
 }
+
+// 流式回调事件类型
+export type StreamEvent =
+  | { type: 'text_delta'; text: string }
+  | { type: 'tool_start'; toolCall: ToolCall }
+  | { type: 'tool_end'; toolCall: ToolCall }
+  | { type: 'done'; response: AgentResponse }
+  | { type: 'error'; error: string };
 
 export type NodeSize = 'small' | 'medium' | 'large';
 
