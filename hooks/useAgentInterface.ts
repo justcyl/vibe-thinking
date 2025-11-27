@@ -65,11 +65,14 @@ const applyOperation = (
   return { next: project, changed: false };
 };
 
+const STORAGE_KEY = 'vibe-thinking-conversations';
+
 /**
  * Agent 交互 Hook
  * - 支持多对话历史管理
  * - 每个对话绑定一个画布作为上下文
  * - 画布内容实时更新到上下文
+ * - 对话历史持久化到 localStorage
  */
 export const useAgentInterface = ({
   data,
@@ -84,10 +87,29 @@ export const useAgentInterface = ({
   const [isAgentProcessing, setIsAgentProcessing] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelId>(DEFAULT_MODEL_ID as ModelId);
 
-  // 对话管理
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  // 对话管理 - 从 localStorage 初始化
+  const [conversations, setConversations] = useState<Conversation[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Failed to load conversations from localStorage:', e);
+    }
+    return [];
+  });
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // 保存对话到 localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+    } catch (e) {
+      console.error('Failed to save conversations to localStorage:', e);
+    }
+  }, [conversations]);
 
   // 获取当前对话
   const currentConversation = useMemo(() =>
@@ -142,22 +164,11 @@ export const useAgentInterface = ({
     setIsResizingAgent(true);
   }, []);
 
-  // 新建对话 - 绑定当前画布
+  // 新建对话 - 只清空当前对话ID，实际对话在发送第一条消息时创建
   const newConversation = useCallback(() => {
-    const now = Date.now();
-    const newConv: Conversation = {
-      id: generateNodeId(),
-      title: `对话 ${conversations.length + 1}`,
-      messages: [],
-      canvasId: currentCanvasId,
-      canvasName: currentCanvasName,
-      createdAt: now,
-      updatedAt: now,
-    };
-    setConversations(prev => [newConv, ...prev]);
-    setCurrentConversationId(newConv.id);
+    setCurrentConversationId(null);
     setShowHistory(false);
-  }, [conversations.length, currentCanvasId, currentCanvasName]);
+  }, []);
 
   // 选择对话
   const selectConversation = useCallback((id: string) => {

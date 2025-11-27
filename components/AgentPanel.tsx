@@ -280,8 +280,8 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
         </div>
       ) : (
         <>
-          {/* Canvas Context Indicator */}
-          {currentConversation && (
+          {/* Canvas Context Indicator - 只有当对话有消息时才显示 */}
+          {currentConversation && currentConversation.messages.length > 0 && (
             <div className={`px-3 py-2 border-b flex items-center gap-2 ${borderClass} ${theme === 'dark' ? 'bg-[#252526]' : 'bg-neutral-100'}`}>
               <Layout size={12} className="opacity-50 flex-shrink-0" />
               <span className="text-[10px] truncate">
