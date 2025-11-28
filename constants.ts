@@ -232,4 +232,4 @@ export const MODEL_OPTIONS: ModelOption[] = [
   { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
 ];
 
-export const DEFAULT_MODEL_ID = 'gpt-5.1';
+export const DEFAULT_MODEL_ID = 'claude-sonnet-4-5';
