@@ -13,6 +13,7 @@ interface CanvasManager {
   canvases: Canvas[];
   currentCanvasId: string;
   currentCanvas?: Canvas;
+  isStorageReady: boolean;
   isSidebarOpen: boolean;
   editSource: 'sidebar' | 'header' | null;
   editingCanvasId: string | null;
@@ -232,6 +233,7 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     canvases,
     currentCanvasId,
     currentCanvas,
+    isStorageReady,
     isSidebarOpen,
     editSource,
     editingCanvasId,

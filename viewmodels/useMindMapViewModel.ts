@@ -132,6 +132,7 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     canvases,
     currentCanvasId,
     currentCanvas,
+    isStorageReady,
     isSidebarOpen,
     openSidebar,
     closeSidebar,
@@ -331,12 +332,13 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     pushState(latestProjectRef.current);
   }, [pushState]);
 
-  // Initialize history manager with current canvas data on mount
+  const hasLoadedStorageRef = useRef(false);
+
   useEffect(() => {
-    if (currentCanvas?.data) {
-      loadHistory(currentCanvas.data);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!isStorageReady || !currentCanvas?.data || hasLoadedStorageRef.current) return;
+    loadHistory(currentCanvas.data);
+    hasLoadedStorageRef.current = true;
+  }, [isStorageReady, currentCanvas?.data, loadHistory]);
 
   const handleReparentNode = useCallback(
     (nodeId: string, newParentId: string | null) => {
