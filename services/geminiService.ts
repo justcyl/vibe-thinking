@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { NodeType, AgentResponse } from '../types';
+import { NodeType } from '../types';
 
 const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
@@ -123,95 +123,3 @@ export const generateBrainstormIdeas = async (
     throw error;
   }
 };
-
-// --- Agent Interaction ---
-
-export const chatWithAgent = async (
-  userMessage: string,
-  currentMapData: any[]
-): Promise<AgentResponse> => {
-  if (!apiKey) {
-      throw new Error("API Key missing");
-  }
-
-  const systemInstruction = `
-    You are a Mind Map Assistant (思维助理). You can converse with the user and also MODIFY the mind map directly.
-    
-    You have access to the current state of the mind map (Nodes with IDs, Types, Content).
-    
-    Your Capabilities:
-    1. Answer questions based on the mind map context.
-    2. Suggest improvements.
-    3. Execute operations to ADD, UPDATE, or DELETE nodes.
-
-    Output Format:
-    You must output JSON with two fields:
-    - "reply": A string containing your conversational response to the user (in Simplified Chinese).
-    - "operations": An array of operation objects.
-    
-    Operations Types:
-    1. ADD_CHILD: { "action": "ADD_CHILD", "parentId": "ID_OF_PARENT", "nodeType": "TYPE", "content": "TEXT" }
-       - Note: Use "type" rules (Topic -> Problem -> Hypothesis -> Action -> Evidence).
-    2. UPDATE_CONTENT: { "action": "UPDATE_CONTENT", "nodeId": "ID_OF_NODE", "content": "NEW_TEXT" }
-    3. DELETE_NODE: { "action": "DELETE_NODE", "nodeId": "ID_OF_NODE" }
-
-    Constraint:
-    - Only perform operations if the user explicitly asks for changes or if it adds significant value.
-    - If just chatting, return "operations": [].
-    - Refer to nodes by their exact IDs provided in the context.
-    - CRITICAL: DO NOT repeat or echo the input mind map data in your response. The response must be concise and only contain the 'reply' and 'operations'.
-  `;
-
-  const prompt = `
-    Current Mind Map State (Flat List):
-    ${JSON.stringify(currentMapData, null, 2)}
-
-    User Message:
-    "${userMessage}"
-  `;
-
-  try {
-      const response = await ai.models.generateContent({
-          model: modelName,
-          contents: prompt,
-          config: {
-              systemInstruction: systemInstruction,
-              responseMimeType: "application/json",
-              responseSchema: {
-                  type: Type.OBJECT,
-                  properties: {
-                      reply: { type: Type.STRING },
-                      operations: {
-                          type: Type.ARRAY,
-                          items: {
-                              type: Type.OBJECT,
-                              properties: {
-                                  action: { type: Type.STRING, enum: ['ADD_CHILD', 'UPDATE_CONTENT', 'DELETE_NODE'] },
-                                  parentId: { type: Type.STRING },
-                                  nodeId: { type: Type.STRING },
-                                  nodeType: { type: Type.STRING, enum: ['topic', 'problem', 'hypothesis', 'action', 'evidence'] },
-                                  content: { type: Type.STRING }
-                              },
-                              required: ['action']
-                          }
-                      }
-                  },
-                  required: ['reply', 'operations']
-              }
-          }
-      });
-
-      let text = response.text;
-      if (!text) throw new Error("Empty response from Agent");
-      
-      text = cleanJsonText(text);
-      const parsed = JSON.parse(text) as AgentResponse;
-      return parsed;
-  } catch (error) {
-      console.error("Agent Error:", error);
-      return {
-          reply: "抱歉，我在处理您的请求时遇到了问题 (JSON Parse Error)。请尝试减少思维导图的大小或重试。",
-          operations: []
-      };
-  }
-}

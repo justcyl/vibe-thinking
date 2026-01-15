@@ -3,12 +3,10 @@ import path from 'path';
 
 interface StorageState {
   canvases: unknown[];
-  conversations: unknown[];
 }
 
 const DEFAULT_STATE: StorageState = {
   canvases: [],
-  conversations: [],
 };
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -30,7 +28,6 @@ const readStorageFile = async (): Promise<StorageState> => {
     const parsed = JSON.parse(raw);
     return {
       canvases: Array.isArray(parsed?.canvases) ? parsed.canvases : [],
-      conversations: Array.isArray(parsed?.conversations) ? parsed.conversations : [],
     };
   } catch (error) {
     console.error('Failed to parse storage file', error);
@@ -54,7 +51,6 @@ export const updateStorageState = async (partial: Partial<StorageState>): Promis
   const current = await readStorageFile();
   const next: StorageState = {
     canvases: partial.canvases ?? current.canvases,
-    conversations: partial.conversations ?? current.conversations,
   };
   await writeStorageFile(next);
   return next;

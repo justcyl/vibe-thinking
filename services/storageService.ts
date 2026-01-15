@@ -1,4 +1,4 @@
-import { Canvas, Conversation } from '@/types';
+import { Canvas } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
@@ -28,17 +28,5 @@ export const saveCanvases = async (canvases: Canvas[]): Promise<void> => {
   await requestJson('/api/storage/canvases', {
     method: 'PUT',
     body: JSON.stringify({ canvases }),
-  });
-};
-
-export const fetchConversations = async (): Promise<Conversation[]> => {
-  const data = await requestJson<{ conversations?: Conversation[] }>('/api/storage/conversations');
-  return Array.isArray(data.conversations) ? data.conversations : [];
-};
-
-export const saveConversations = async (conversations: Conversation[]): Promise<void> => {
-  await requestJson('/api/storage/conversations', {
-    method: 'PUT',
-    body: JSON.stringify({ conversations }),
   });
 };
