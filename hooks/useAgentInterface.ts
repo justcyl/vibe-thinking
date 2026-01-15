@@ -3,6 +3,7 @@ import { AgentMessage, AgentOperation, MindMapNode, MindMapProject, NodeType, Mo
 import { chatWithAgentStream } from '@/services/claudeService';
 import { addNode, deleteNode, generateNodeId, serializeForestForAgent, updateNode } from '@/utils/layout';
 import { DEFAULT_MODEL_ID } from '@/constants';
+import { fetchConversations, saveConversations } from '@/services/storageService';
 
 interface UseAgentInterfaceOptions {
   data: MindMapProject;
@@ -69,8 +70,6 @@ const applyOperation = (
   return { next: project, changed: false };
 };
 
-const STORAGE_KEY = 'vibe-thinking-conversations';
-
 /**
  * Agent 交互 Hook
  * - 支持多对话历史管理
@@ -97,29 +96,44 @@ export const useAgentInterface = ({
   // 流式文本状态
   const [streamingText, setStreamingText] = useState('');
 
-  // 对话管理 - 从 localStorage 初始化
-  const [conversations, setConversations] = useState<Conversation[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (e) {
-      console.error('Failed to load conversations from localStorage:', e);
-    }
-    return [];
-  });
+  // 对话管理 - 从服务端存储初始化
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [isStorageReady, setIsStorageReady] = useState(false);
 
-  // 保存对话到 localStorage
+  // 读取对话
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-    } catch (e) {
-      console.error('Failed to save conversations to localStorage:', e);
-    }
-  }, [conversations]);
+    let isActive = true;
+
+    const load = async () => {
+      try {
+        const stored = await fetchConversations();
+        if (!isActive) return;
+        setConversations(stored);
+      } catch (e) {
+        console.error('Failed to load conversations from server:', e);
+      } finally {
+        if (isActive) {
+          setIsStorageReady(true);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  // 保存对话到服务端
+  useEffect(() => {
+    if (!isStorageReady) return;
+    saveConversations(conversations).catch((e) => {
+      console.error('Failed to save conversations to server:', e);
+    });
+  }, [conversations, isStorageReady]);
 
   // 获取当前对话
   const currentConversation = useMemo(() =>

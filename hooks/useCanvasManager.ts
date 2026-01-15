@@ -2,22 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, MindMapProject, NodeType } from '@/types';
 import { LABELS } from '@/constants';
 import { generateNodeId } from '@/utils/layout';
-
-const CANVAS_STORAGE_KEY = 'vibe-thinking-canvases';
-
-const loadCanvasesFromStorage = (fallback: Canvas[]): Canvas[] => {
-  if (typeof window === 'undefined') return fallback;
-  try {
-    const cached = localStorage.getItem(CANVAS_STORAGE_KEY);
-    if (!cached) return fallback;
-    const parsed = JSON.parse(cached);
-    if (!Array.isArray(parsed) || parsed.length === 0) return fallback;
-    return parsed as Canvas[];
-  } catch (error) {
-    console.error('Failed to parse canvases from localStorage', error);
-    return fallback;
-  }
-};
+import { fetchCanvases, saveCanvases } from '@/services/storageService';
 
 interface UseCanvasManagerOptions {
   initialData: MindMapProject;
@@ -61,9 +46,10 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
     [initialData, labels.untitledCanvas]
   );
 
-  const [canvases, setCanvases] = useState<Canvas[]>(() => loadCanvasesFromStorage([initialCanvas]));
-  const [currentCanvasId, setCurrentCanvasId] = useState(() => canvases[0]?.id ?? initialCanvas.id);
+  const [canvases, setCanvases] = useState<Canvas[]>([initialCanvas]);
+  const [currentCanvasId, setCurrentCanvasId] = useState(() => initialCanvas.id);
   const currentCanvasIdRef = useRef(currentCanvasId);
+  const [isStorageReady, setIsStorageReady] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editSource, setEditSource] = useState<'sidebar' | 'header' | null>(null);
   const [editingCanvasId, setEditingCanvasId] = useState<string | null>(null);
@@ -203,13 +189,44 @@ export const useCanvasManager = ({ initialData, labels = LABELS }: UseCanvasMana
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      localStorage.setItem(CANVAS_STORAGE_KEY, JSON.stringify(canvases));
-    } catch (error) {
-      console.error('Failed to save canvases to localStorage', error);
-    }
-  }, [canvases]);
+    let isActive = true;
+
+    const load = async () => {
+      try {
+        const stored = await fetchCanvases();
+        if (!isActive) return;
+        if (stored.length > 0) {
+          setCanvases(stored);
+          currentCanvasIdRef.current = stored[0].id;
+          setCurrentCanvasId(stored[0].id);
+        } else {
+          setCanvases([initialCanvas]);
+          currentCanvasIdRef.current = initialCanvas.id;
+          setCurrentCanvasId(initialCanvas.id);
+          await saveCanvases([initialCanvas]);
+        }
+      } catch (error) {
+        console.error('Failed to load canvases from server', error);
+      } finally {
+        if (isActive) {
+          setIsStorageReady(true);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isActive = false;
+    };
+  }, [initialCanvas]);
+
+  useEffect(() => {
+    if (!isStorageReady) return;
+    saveCanvases(canvases).catch((error) => {
+      console.error('Failed to save canvases to server', error);
+    });
+  }, [canvases, isStorageReady]);
 
   return {
     canvases,
