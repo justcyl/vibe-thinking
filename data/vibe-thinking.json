@@ -1,0 +1,2185 @@
+{
+  "canvases": [
+    {
+      "id": "canvas_1764064795370",
+      "name": "vibe-thinking",
+      "createdAt": 1764064795370,
+      "updatedAt": 1768475774884,
+      "data": {
+        "nodes": {
+          "ROOT001": {
+            "id": "ROOT001",
+            "type": "topic",
+            "content": "vibe-thinking",
+            "children": [
+              "5RY10V",
+              "AUC738",
+              "J0U1CU"
+            ],
+            "parentId": null,
+            "x": 0,
+            "y": 0
+          },
+          "5RY10V": {
+            "id": "5RY10V",
+            "type": "problem",
+            "content": "Agent Mode",
+            "children": [
+              "L5NVR1",
+              "TPJ46M",
+              "W87DVM"
+            ],
+            "parentId": "ROOT001"
+          },
+          "L5NVR1": {
+            "id": "L5NVR1",
+            "type": "hypothesis",
+            "content": "MCP",
+            "children": [
+              "EYY8LP",
+              "P3ED6D"
+            ],
+            "parentId": "5RY10V"
+          },
+          "P3ED6D": {
+            "id": "P3ED6D",
+            "type": "evidence",
+            "content": "mcp 效率低下，而且不好回传中间过程",
+            "children": [],
+            "parentId": "L5NVR1"
+          },
+          "TPJ46M": {
+            "id": "TPJ46M",
+            "type": "hypothesis",
+            "content": "Claude Agent SDK",
+            "children": [
+              "ZXOW2U",
+              "CU3JPM"
+            ],
+            "parentId": "5RY10V"
+          },
+          "W87DVM": {
+            "id": "W87DVM",
+            "type": "hypothesis",
+            "content": "类似 vibe-kanban 使用协议与 code cli agent 交互",
+            "children": [
+              "0KKD7O"
+            ],
+            "parentId": "5RY10V"
+          },
+          "EYY8LP": {
+            "id": "EYY8LP",
+            "type": "evidence",
+            "content": "不需要额外前端面板，交互方便",
+            "children": [],
+            "parentId": "L5NVR1"
+          },
+          "AUC738": {
+            "id": "AUC738",
+            "type": "problem",
+            "content": "树形态不够灵活",
+            "children": [
+              "U8QKWP",
+              "XC4VVW",
+              "C7DSZM"
+            ],
+            "parentId": "ROOT001"
+          },
+          "ZXOW2U": {
+            "id": "ZXOW2U",
+            "type": "action",
+            "content": "Claude Agent SDK 入门\nhttps://github.com/kenneth-liao/claude-agent-sdk-intro",
+            "children": [],
+            "parentId": "TPJ46M"
+          },
+          "J0U1CU": {
+            "id": "J0U1CU",
+            "type": "hypothesis",
+            "content": "项目目标",
+            "children": [
+              "KHAMOA",
+              "R2612J"
+            ],
+            "parentId": "ROOT001"
+          },
+          "KHAMOA": {
+            "id": "KHAMOA",
+            "type": "evidence",
+            "content": "思维可视化",
+            "children": [],
+            "parentId": "J0U1CU"
+          },
+          "R2612J": {
+            "id": "R2612J",
+            "type": "hypothesis",
+            "content": "传递上下文",
+            "children": [
+              "NZJWNT"
+            ],
+            "parentId": "J0U1CU"
+          },
+          "NZJWNT": {
+            "id": "NZJWNT",
+            "type": "problem",
+            "content": "目标较难实现，很难将全部上下文传递（如较新的概念，跨会话概念）",
+            "children": [],
+            "parentId": "R2612J"
+          },
+          "0KKD7O": {
+            "id": "0KKD7O",
+            "type": "evidence",
+            "content": "不依赖某个具体 agent cli",
+            "children": [
+              "78AGV9"
+            ],
+            "parentId": "W87DVM"
+          },
+          "78AGV9": {
+            "id": "78AGV9",
+            "type": "problem",
+            "content": "但适配较难",
+            "children": [],
+            "parentId": "0KKD7O"
+          },
+          "U8QKWP": {
+            "id": "U8QKWP",
+            "type": "hypothesis",
+            "content": "添加“逻辑连线”",
+            "children": [],
+            "parentId": "AUC738"
+          },
+          "XC4VVW": {
+            "id": "XC4VVW",
+            "type": "hypothesis",
+            "content": "改为 d3-dag 或 d3-force",
+            "children": [
+              "FBZJ0U"
+            ],
+            "parentId": "AUC738"
+          },
+          "FBZJ0U": {
+            "id": "FBZJ0U",
+            "type": "evidence",
+            "content": "非树形结构较复杂",
+            "children": [],
+            "parentId": "XC4VVW"
+          },
+          "CU3JPM": {
+            "id": "CU3JPM",
+            "type": "problem",
+            "content": "工具调用有问题",
+            "children": [],
+            "parentId": "TPJ46M"
+          },
+          "C7DSZM": {
+            "id": "C7DSZM",
+            "type": "hypothesis",
+            "content": "改为画布形态/或者同时保留树形态",
+            "children": [],
+            "parentId": "AUC738"
+          }
+        },
+        "rootIds": [
+          "ROOT001"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764065180118",
+      "name": "tir",
+      "createdAt": 1764065180118,
+      "updatedAt": 1768475598278,
+      "data": {
+        "nodes": {
+          "AE71L3": {
+            "id": "AE71L3",
+            "type": "topic",
+            "content": "agent 认知学：LLM 中的认知行为和实用行为。通过强化学习让模型更好地认知环境",
+            "children": [
+              "NQ6FBQ",
+              "V8VKZT",
+              "MXR6CW"
+            ],
+            "parentId": null,
+            "x": -176.25,
+            "y": 12.5
+          },
+          "MXR6CW": {
+            "id": "MXR6CW",
+            "type": "hypothesis",
+            "content": "现有 Agent 缺乏足够的认知性行为",
+            "children": [
+              "3VU5PO",
+              "YYHSY4",
+              "H7HUSS",
+              "LHO2YR",
+              "IWWQ8C",
+              "FTBM8T",
+              "T2YCN8",
+              "Z4CJM5"
+            ],
+            "parentId": "AE71L3"
+          },
+          "3VU5PO": {
+            "id": "3VU5PO",
+            "type": "evidence",
+            "content": "Agent 在新环境表现差",
+            "children": [
+              "7L3Z2H"
+            ],
+            "parentId": "MXR6CW"
+          },
+          "YYHSY4": {
+            "id": "YYHSY4",
+            "type": "hypothesis",
+            "content": "认知行为可以减少 Agent 心智负担",
+            "children": [
+              "T9XNQF"
+            ],
+            "parentId": "MXR6CW"
+          },
+          "H7HUSS": {
+            "id": "H7HUSS",
+            "type": "hypothesis",
+            "content": "Reward 只奖励最后成功性/效率性，导致认知行为被抑制",
+            "children": [
+              "W2GZH6",
+              "T5XJLI",
+              "BZ00OG",
+              "Y09S09",
+              "UAC5WP"
+            ],
+            "parentId": "MXR6CW"
+          },
+          "LHO2YR": {
+            "id": "LHO2YR",
+            "type": "problem",
+            "content": "需要 Agent 平台验证想法",
+            "children": [],
+            "parentId": "MXR6CW"
+          },
+          "IWWQ8C": {
+            "id": "IWWQ8C",
+            "type": "action",
+            "content": "是否有相关论文研究 LLM 和 认知行为",
+            "children": [
+              "B97M3A",
+              "TA1NAI",
+              "2NAAZ3"
+            ],
+            "parentId": "MXR6CW"
+          },
+          "NQ6FBQ": {
+            "id": "NQ6FBQ",
+            "type": "evidence",
+            "content": "人的行为存在认知行为和实用行为   \nOn Distinguishing Epistemic from Pragmatic Action",
+            "children": [],
+            "parentId": "AE71L3"
+          },
+          "FTBM8T": {
+            "id": "FTBM8T",
+            "type": "hypothesis",
+            "content": "思考能被作为一种认知行为吗\nhttps://gemini.google.com/app/418bcf13e77fd035",
+            "children": [],
+            "parentId": "MXR6CW"
+          },
+          "T2YCN8": {
+            "id": "T2YCN8",
+            "type": "problem",
+            "content": "不同任务场景下，如何构造相应的认知行为（元学习,即把认知行为当做元技能）",
+            "children": [
+              "MK2973"
+            ],
+            "parentId": "MXR6CW"
+          },
+          "B97M3A": {
+            "id": "B97M3A",
+            "type": "problem",
+            "content": "REACT 本身是不是就是认知行为的体现？即思考和行动的循环，用行动为了更好地思考",
+            "children": [
+              "LPY81I"
+            ],
+            "parentId": "IWWQ8C"
+          },
+          "94V65B": {
+            "id": "94V65B",
+            "type": "action",
+            "content": "研究各家 chat template",
+            "children": [
+              "GAIMYQ",
+              "8ZDGTZ"
+            ],
+            "parentId": "AMZC9Z"
+          },
+          "GAIMYQ": {
+            "id": "GAIMYQ",
+            "type": "evidence",
+            "content": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking#interleaved-thinking",
+            "children": [],
+            "parentId": "94V65B"
+          },
+          "AMZC9Z": {
+            "id": "AMZC9Z",
+            "type": "problem",
+            "content": "目前各家大模型是如何实现 tir 的 ",
+            "children": [
+              "94V65B",
+              "FCGS7R"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "FCGS7R": {
+            "id": "FCGS7R",
+            "type": "action",
+            "content": "研究 agent",
+            "children": [
+              "Y003LC",
+              "XM3838",
+              "6G4UYU",
+              "5Z8Z3K"
+            ],
+            "parentId": "AMZC9Z"
+          },
+          "XM3838": {
+            "id": "XM3838",
+            "type": "evidence",
+            "content": "minimax/mini-agent",
+            "children": [],
+            "parentId": "FCGS7R"
+          },
+          "6G4UYU": {
+            "id": "6G4UYU",
+            "type": "evidence",
+            "content": "qwen-agent",
+            "children": [],
+            "parentId": "FCGS7R"
+          },
+          "5Z8Z3K": {
+            "id": "5Z8Z3K",
+            "type": "evidence",
+            "content": "mini-swe-agent",
+            "children": [],
+            "parentId": "FCGS7R"
+          },
+          "Y003LC": {
+            "id": "Y003LC",
+            "type": "evidence",
+            "content": "codex",
+            "children": [],
+            "parentId": "FCGS7R"
+          },
+          "8ZDGTZ": {
+            "id": "8ZDGTZ",
+            "type": "evidence",
+            "content": "gpt-oss and  harmony api",
+            "children": [],
+            "parentId": "94V65B"
+          },
+          "KAEFYT": {
+            "id": "KAEFYT",
+            "type": "topic",
+            "content": "thinking as tool",
+            "children": [
+              "AMZC9Z",
+              "COFPBF",
+              "DLVOH4",
+              "OA9CNC",
+              "JSA1T4",
+              "FHN46X",
+              "0HSZSB",
+              "I2O7ZY"
+            ],
+            "parentId": null,
+            "x": 7732.5,
+            "y": -65
+          },
+          "COFPBF": {
+            "id": "COFPBF",
+            "type": "hypothesis",
+            "content": "REACT  每次 call tool 都要 thinking ",
+            "children": [
+              "YW1H3V",
+              "CZRTVZ",
+              "6KD5Y7"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "YW1H3V": {
+            "id": "YW1H3V",
+            "type": "evidence",
+            "content": "并没有，像 oss 就是出现在任意地方(https://openai.com/zh-Hans-CN/index/introducing-gpt-oss/),kimi(https://moonshotai.github.io/Kimi-K2/thinking.html) 貌似是 ",
+            "children": [
+              "IGQAKJ"
+            ],
+            "parentId": "COFPBF"
+          },
+          "CZRTVZ": {
+            "id": "CZRTVZ",
+            "type": "problem",
+            "content": "我们需要实现怎样的颗粒度，k=0 是 plan and act, k=n 是 think after every act",
+            "children": [
+              "A0JQ1T",
+              "L9YZZF"
+            ],
+            "parentId": "COFPBF"
+          },
+          "L9YZZF": {
+            "id": "L9YZZF",
+            "type": "hypothesis",
+            "content": "parallelmuse 那样监控指标来决定是否思考",
+            "children": [
+              "ZYMUN3"
+            ],
+            "parentId": "CZRTVZ"
+          },
+          "A0JQ1T": {
+            "id": "A0JQ1T",
+            "type": "evidence",
+            "content": "和 efficient reasoning 不同，不仅决定思考多长，还有决定合适出现思考",
+            "children": [],
+            "parentId": "CZRTVZ"
+          },
+          "DLVOH4": {
+            "id": "DLVOH4",
+            "type": "problem",
+            "content": "如何获取 TIR 数据？",
+            "children": [
+              "PQVXHK",
+              "JJE7NM"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "PQVXHK": {
+            "id": "PQVXHK",
+            "type": "hypothesis",
+            "content": "蒸馏自 OSS/Deepresearch\nhttps://www.zhihu.com/pin/1961861005261903196",
+            "children": [
+              "B2L3V9",
+              "2O573N",
+              "Z88OTG",
+              "PHGAJZ"
+            ],
+            "parentId": "DLVOH4"
+          },
+          "5LSGD8": {
+            "id": "5LSGD8",
+            "type": "topic",
+            "content": "什么是 TIR",
+            "children": [
+              "LP3ZUK"
+            ],
+            "parentId": null,
+            "x": -1596.25,
+            "y": -47.5
+          },
+          "LP3ZUK": {
+            "id": "LP3ZUK",
+            "type": "problem",
+            "content": "新节点...",
+            "children": [],
+            "parentId": "5LSGD8"
+          },
+          "ZYMUN3": {
+            "id": "ZYMUN3",
+            "type": "action",
+            "content": "监控 OSS 的困惑度/熵",
+            "children": [],
+            "parentId": "L9YZZF"
+          },
+          "TA1NAI": {
+            "id": "TA1NAI",
+            "type": "evidence",
+            "content": "2506.00886 理论上分析了 Agent 认知和行动。即“下一个工具”是什么很重要（damn...把上面的想法写成 paper 了，也是没有给出具体技术）",
+            "children": [
+              "L9UECR"
+            ],
+            "parentId": "IWWQ8C"
+          },
+          "LPY81I": {
+            "id": "LPY81I",
+            "type": "hypothesis",
+            "content": "是的，但 ReAct 没有主动选择思考，而且思考不是唯一的认知行为",
+            "children": [
+              "S3GM0B"
+            ],
+            "parentId": "B97M3A"
+          },
+          "T5XJLI": {
+            "id": "T5XJLI",
+            "type": "problem",
+            "content": "“被抑制”的具体表现是什么？是否能有相关数据集证明这点",
+            "children": [
+              "JZ8VG8",
+              "Z3E3VN",
+              "ZNL3SX"
+            ],
+            "parentId": "H7HUSS"
+          },
+          "OA9CNC": {
+            "id": "OA9CNC",
+            "type": "problem",
+            "content": "为什么要把 thinking 建模成工具",
+            "children": [
+              "MD3IEY",
+              "RM004G",
+              "6NL96S"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "MD3IEY": {
+            "id": "MD3IEY",
+            "type": "evidence",
+            "content": "自动调用/主动思考，不局限于 TAO。特点是思考出现在任何位置，长短不限。",
+            "children": [
+              "XC1A83",
+              "X3RYLX"
+            ],
+            "parentId": "OA9CNC"
+          },
+          "XC1A83": {
+            "id": "XC1A83",
+            "type": "problem",
+            "content": "现在的 openai claude deepseek 这种将工具放在 COT 也能做到(即Interleaved Reasoning)。那么区别是什么",
+            "children": [
+              "DQ6ODX"
+            ],
+            "parentId": "MD3IEY"
+          },
+          "RM004G": {
+            "id": "RM004G",
+            "type": "hypothesis",
+            "content": "决策一致，训练可以平等对待",
+            "children": [
+              "PKU2XU",
+              "OFO81N",
+              "APFN3W"
+            ],
+            "parentId": "OA9CNC"
+          },
+          "6NL96S": {
+            "id": "6NL96S",
+            "type": "hypothesis",
+            "content": "更多扩展性",
+            "children": [
+              "SMR7SJ",
+              "6GOIXE",
+              "R58Z0K"
+            ],
+            "parentId": "OA9CNC"
+          },
+          "SMR7SJ": {
+            "id": "SMR7SJ",
+            "type": "hypothesis",
+            "content": "parallel reasoning",
+            "children": [],
+            "parentId": "6NL96S"
+          },
+          "6GOIXE": {
+            "id": "6GOIXE",
+            "type": "hypothesis",
+            "content": "上下文管理，例如选择性保留若干工具的输出，压缩",
+            "children": [
+              "H05G31",
+              "KBAUSL"
+            ],
+            "parentId": "6NL96S"
+          },
+          "JJE7NM": {
+            "id": "JJE7NM",
+            "type": "problem",
+            "content": "是否泛化多工具，还是解决单领域问题",
+            "children": [
+              "YRU7LN"
+            ],
+            "parentId": "DLVOH4"
+          },
+          "YRU7LN": {
+            "id": "YRU7LN",
+            "type": "hypothesis",
+            "content": "选择解决那些长程，多分支的任务，用以体现主动思考的优势",
+            "children": [],
+            "parentId": "JJE7NM"
+          },
+          "APFN3W": {
+            "id": "APFN3W",
+            "type": "hypothesis",
+            "content": "将动作视为有成本的动作，防止胡思乱想，也防止动作太多导致费用上涨",
+            "children": [
+              "RCD9TM"
+            ],
+            "parentId": "RM004G"
+          },
+          "RCD9TM": {
+            "id": "RCD9TM",
+            "type": "problem",
+            "content": "是否有 case 出现 胡思乱想的问题",
+            "children": [
+              "KUYFLY"
+            ],
+            "parentId": "APFN3W"
+          },
+          "KUYFLY": {
+            "id": "KUYFLY",
+            "type": "evidence",
+            "content": "OTC-PO：解决调用工具次数过多的问题",
+            "children": [],
+            "parentId": "RCD9TM"
+          },
+          "OFO81N": {
+            "id": "OFO81N",
+            "type": "hypothesis",
+            "content": "根据困惑指标来选择思考还是行动",
+            "children": [],
+            "parentId": "RM004G"
+          },
+          "PKU2XU": {
+            "id": "PKU2XU",
+            "type": "hypothesis",
+            "content": "比起以前对动作归因，现在对思维归因是否更好",
+            "children": [],
+            "parentId": "RM004G"
+          },
+          "DQ6ODX": {
+            "id": "DQ6ODX",
+            "type": "evidence",
+            "content": "核心应该放在：将思考视为动作",
+            "children": [],
+            "parentId": "XC1A83"
+          },
+          "KBAUSL": {
+            "id": "KBAUSL",
+            "type": "evidence",
+            "content": "传统线性 agent 的 thinking 过程没法更改，尽管有 oh but wait 修正但还是会浪费上下文",
+            "children": [
+              "O0WEFJ"
+            ],
+            "parentId": "6GOIXE"
+          },
+          "JSA1T4": {
+            "id": "JSA1T4",
+            "type": "problem",
+            "content": "如何对 thinking 设计奖励函数",
+            "children": [
+              "LVZN5P"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "O0WEFJ": {
+            "id": "O0WEFJ",
+            "type": "evidence",
+            "content": "再加上用户不想等待太久，所以目前都是短思考，也就不需要 adaptive thinking",
+            "children": [],
+            "parentId": "KBAUSL"
+          },
+          "X3RYLX": {
+            "id": "X3RYLX",
+            "type": "hypothesis",
+            "content": "需要满足前提：现有的 reasoning 耗时长 or 短思考不够用",
+            "children": [],
+            "parentId": "MD3IEY"
+          },
+          "FHN46X": {
+            "id": "FHN46X",
+            "type": "action",
+            "content": "数据集准备",
+            "children": [
+              "N126TB",
+              "7XJTSV"
+            ],
+            "parentId": "KAEFYT"
+          },
+          "B2L3V9": {
+            "id": "B2L3V9",
+            "type": "problem",
+            "content": "too'hard 没有指导不知道蒸馏什么数据，不知道如何配置 RL 完全从零出发",
+            "children": [],
+            "parentId": "PQVXHK"
+          },
+          "2O573N": {
+            "id": "2O573N",
+            "type": "problem",
+            "content": "蒸馏得到的 thinking 质量是否符合课题要求",
+            "children": [],
+            "parentId": "PQVXHK"
+          },
+          "N126TB": {
+            "id": "N126TB",
+            "type": "action",
+            "content": "TORL-math",
+            "children": [],
+            "parentId": "FHN46X"
+          },
+          "7XJTSV": {
+            "id": "7XJTSV",
+            "type": "action",
+            "content": "Webshop",
+            "children": [],
+            "parentId": "FHN46X"
+          },
+          "BZ00OG": {
+            "id": "BZ00OG",
+            "type": "hypothesis",
+            "content": "比较那些高效率方法的模型，是否这种抑制行为更严重",
+            "children": [],
+            "parentId": "H7HUSS"
+          },
+          "T9XNQF": {
+            "id": "T9XNQF",
+            "type": "problem",
+            "content": "有什么显式现象可以体现这点",
+            "children": [],
+            "parentId": "YYHSY4"
+          },
+          "V8VKZT": {
+            "id": "V8VKZT",
+            "type": "problem",
+            "content": "LLM认知行为具体表现是什么？是更多思考，还是更曲折的动作？",
+            "children": [],
+            "parentId": "AE71L3"
+          },
+          "7L3Z2H": {
+            "id": "7L3Z2H",
+            "type": "hypothesis",
+            "content": "是否与认知行为有关，例如遇到一个新工具（甚至是匿名工具），会先学习如何使用工具",
+            "children": [],
+            "parentId": "3VU5PO"
+          },
+          "Z88OTG": {
+            "id": "Z88OTG",
+            "type": "problem",
+            "content": "能否由在线服务商蒸馏",
+            "children": [],
+            "parentId": "PQVXHK"
+          },
+          "0HSZSB": {
+            "id": "0HSZSB",
+            "type": "problem",
+            "content": "选择基线",
+            "children": [],
+            "parentId": "KAEFYT"
+          },
+          "JZ8VG8": {
+            "id": "JZ8VG8",
+            "type": "hypothesis",
+            "content": "当用户问“苹果最新的财报怎么样？”时，Agent 可能会先搜索“苹果 2024 财报发布日期”\nhttps://gemini.google.com/app/02f33dcfb7d54237",
+            "children": [],
+            "parentId": "T5XJLI"
+          },
+          "Z3E3VN": {
+            "id": "Z3E3VN",
+            "type": "hypothesis",
+            "content": "Agent 点击“筛选：蓝色”按钮。这直接改变了它看到的网页内容（环境输入），过滤掉了无关干扰项。",
+            "children": [],
+            "parentId": "T5XJLI"
+          },
+          "ZNL3SX": {
+            "id": "ZNL3SX",
+            "type": "problem",
+            "content": "每个领域问题都人为设计什么是“认知行为”吗，能否抽象出来",
+            "children": [
+              "5713PY"
+            ],
+            "parentId": "T5XJLI"
+          },
+          "Y09S09": {
+            "id": "Y09S09",
+            "type": "problem",
+            "content": "如果已有奖励不行，那么应该如何用奖励提升 agent 的认知行为频率",
+            "children": [],
+            "parentId": "H7HUSS"
+          },
+          "W2GZH6": {
+            "id": "W2GZH6",
+            "type": "hypothesis",
+            "content": "现有方法的 badcase 是因为认知行为被抑制而失败的吗？如果不是那么鼓励认知行为反而可能导致低效？抑或也有可能能更高效？总之从正确率和效率出发",
+            "children": [],
+            "parentId": "H7HUSS"
+          },
+          "5713PY": {
+            "id": "5713PY",
+            "type": "evidence",
+            "content": "https://gemini.google.com/app/02f33dcfb7d54237\n这是一个非常精彩的视角。将“认知行为”（Epistemic Action）置于交叉学科的显微镜下，我们不仅能评估 LLM Agent，还能触及智能本质的深层原理。\n\nKirsh 和 Maglio 在论文中提出的核心观点是：**行动不仅是为了改变物理世界，更是为了改变信息处理的状态** 。\n\n基于此，我们可以从**信息论、热力学、控制理论、密码学**和**心灵哲学**这五个维度，建立一套跨学科的分析框架：\n\n---\n\n### 1. 信息论视角：香农熵与互信息 (Shannon Entropy & Mutual Information)\n\n在信息论中，认知行为可以被定义为一种**“熵减算子”**。\n\n* **定理关联：香农熵 (Shannon Entropy) **\n* **现象：** Agent 初始状态对问题的解是不确定的，此时系统的熵  很高。\n* \n**分析：** 论文指出，认知行为（如旋转方块）是为了揭示隐藏信息 。这在数学上等同于执行一个动作 ，使得 Agent 内部状态的不确定性下降。\n\n\n* **指标抽象：** 我们可以计算**信息增益 (Information Gain)**。\n\n\n\n普通的 Pragmatic Action 关注物理得分的增加，而 Epistemic Action 关注  的最大化。如果一个 Agent 在物理得分不变的情况下，显著降低了后续 token 预测的困惑度（Perplexity），它就在进行高效的认知行为。\n\n\n\n### 2. 物理学视角：麦克斯韦妖与热力学 (Maxwell's Demon & Thermodynamics)\n\n从物理学角度看，Agent 调用工具的过程，就是**通过做功（消耗计算资源）来换取系统有序度**的过程。\n\n* **定理关联：麦克斯韦妖 (Maxwell's Demon)**\n* **现象：** 物理学中，麦克斯韦妖通过探测分子的速度来控制门的开关，从而降低系统的熵。这需要消耗能量（获取信息的成本）来换取有序。\n* \n**分析：** 论文提到“成本-收益”模型 。Agent 调用 Search API 或运行 Python 代码，消耗了 Token 和推理时间（即“功”），并没有直接产出最终答案（物理做功为0），但它将杂乱的信息进行了“分类”或“验证”。\n\n\n* **指标抽象：** **热力学效率比**。\n\n\n\n具备认知行为的 Agent 就像一个高效的麦克斯韦妖：它知道何时花费少量的能量（比如写一行 `print` 代码），就能大幅度减少系统内部的混乱度（Entropy），从而避免后续高昂的“无效做功”（如长篇大论的幻觉）。\n\n\n\n### 3. 数学与控制理论：非凸优化与模拟退火 (Non-Convex Optimization)\n\n在数学优化问题中，认知行为是对抗“局部最优解”的关键机制。\n\n* **定理关联：模拟退火 (Simulated Annealing) / 扰动 (Perturbation)**\n* \n**现象：** 贪婪算法（Greedy Algorithm）总是寻找当前看来最好的物理路径。论文中提到，如果只看物理距离，某些认知行为（如把方块移远）看起来是“物理上的劣势” 。\n\n\n* **分析：** 在非凸优化曲面（Non-convex landscape）上，直接冲向目标（Pragmatic）往往会卡在局部最优（Local Optima）。认知行为相当于一种**“受控的扰动”**或**“升维攻击”**。Agent 主动偏离目标（移到墙边验证），是为了在一个更高的维度（信息完备度）上寻找通往全局最优（Global Optima）的路径。\n* **指标抽象：** **逃逸率 (Escape Rate)**。评估 Agent 在陷入死循环或低置信度区域时，通过非目标导向的动作成功转移到新状态空间的能力。\n\n\n\n### 4. 密码学与复杂性理论：交互式证明 (Interactive Proof Systems)\n\nAgent 验证自己答案的行为，可以看作是密码学中的零知识证明或交互式证明系统的变体。\n\n* **定理关联：P vs NP (验证比求解容易)**\n* \n**现象：** 论文中通过“把方块移到墙边再移回来”来验证位置 。\n\n\n* **分析：** 在计算复杂性理论中，生成一个解（NP-Hard）通常很难，但验证一个解（P）通常很快。LLM 生成一段代码可能包含隐蔽的 Bug（生成即求解），但让 LLM 写一个测试用例并运行（认知行为即验证），成本极低且极其可靠。\n* **指标抽象：** **验证性冗余 (Verificational Redundancy)**。\n\n\n论文指出，方块落得越高（风险越大），玩家越倾向于验证 。同理，在 Agent 领域，我们可以检测：**当任务风险（Risk）或不确定性上升时，Agent 是否自动增加了验证性动作（Verification Steps）？** 这是一种高级的认知防御机制。\n\n\n\n\n\n### 5. 哲学视角：延展心灵论 (Extended Mind Thesis)\n\n这是最本质的哲学关联，也是这篇论文在认知科学领域的基石。\n\n* **理论关联：安迪·克拉克 (Andy Clark) 的延展心灵 (Extended Mind)**\n* \n**现象：** 论文明确指出，外部动作是为了“改变代理自身的计算状态” 。\n\n\n* **分析：** 传统的笛卡尔二元论认为思维在头脑（LLM 权重）内部，世界在外部。认知行为打破了这一界限。当你使用 Python 计算器时，Python 解释器实际上是你**“思维的一部分”**。对于 Agent 而言，外部工具不仅仅是“手”，更是“外挂的大脑皮层”。\n* **指标抽象：** **认知卸载率 (Cognitive Offloading Rate)**。\n测量 Agent 有多大比例的计算是“必须在内部完成的”，又有多少是主动“卸载”给外部环境的。\n* *低级 Agent：* 试图在 Context 内心算 `123 * 456`。\n* \n*高级 Agent：* 能够识别出这是“计算任务”，迅速将其卸载给计算器，保留宝贵的 Context 窗口用于逻辑推理。这就好比论文中提到的，物理旋转比心理旋转更节省脑力 。\n\n\n\n\n\n\n\n---\n\n### 总结：统一场论下的评估指标\n\n结合以上五个领域，我们可以提出一个抽象的**“认知势能” (Epistemic Potential)** 指标来评估 Agent：\n\n* **解释：** 一个具备高度认知行为的 Agent，是一个**在风险高时（RiskFactor），能够通过低成本动作（Cost），换取最大化互信息增益（）的系统**。\n\n这种分析方式不再局限于“它是否做对了题目”，而是评估“它是否像一个智慧生命体一样，懂得利用物理定律和信息论原理来优化自己的思考过程”。",
+            "children": [],
+            "parentId": "ZNL3SX"
+          },
+          "IGQAKJ": {
+            "id": "IGQAKJ",
+            "type": "problem",
+            "content": "这种是真的出现在任意地方还是只是并行调用",
+            "children": [
+              "AEBA26"
+            ],
+            "parentId": "YW1H3V"
+          },
+          "AEBA26": {
+            "id": "AEBA26",
+            "type": "evidence",
+            "content": "至少 codex 是真的实现思考出现在任意地方",
+            "children": [],
+            "parentId": "IGQAKJ"
+          },
+          "I2O7ZY": {
+            "id": "I2O7ZY",
+            "type": "problem",
+            "content": "后续分析，如何设置指标",
+            "children": [],
+            "parentId": "KAEFYT"
+          },
+          "PHGAJZ": {
+            "id": "PHGAJZ",
+            "type": "problem",
+            "content": "OSS 对于目前的数据集获得的思维过程是否与是简单 ReACT 有足够区别,是否有足够的收益，如何量化",
+            "children": [],
+            "parentId": "PQVXHK"
+          },
+          "LVZN5P": {
+            "id": "LVZN5P",
+            "type": "hypothesis",
+            "content": "以前的方法是如何处理 thinking 的",
+            "children": [],
+            "parentId": "JSA1T4"
+          },
+          "6KD5Y7": {
+            "id": "6KD5Y7",
+            "type": "evidence",
+            "content": "REACT 并非每轮交替， 会根据任务区分\nhttps://zhuanlan.zhihu.com/p/1986190160241644560",
+            "children": [],
+            "parentId": "COFPBF"
+          },
+          "H05G31": {
+            "id": "H05G31",
+            "type": "hypothesis",
+            "content": "压缩上下文工具：将输出作为新的上下文给后续交互",
+            "children": [],
+            "parentId": "6GOIXE"
+          },
+          "MK2973": {
+            "id": "MK2973",
+            "type": "hypothesis",
+            "content": "引入衡量认知行为的指标 $$R_{epistemic}$$ $$R_{total} = R_{outcome} + \\lambda \\cdot R_{epistemic}$$",
+            "children": [
+              "R7GKU1"
+            ],
+            "parentId": "T2YCN8"
+          },
+          "R7GKU1": {
+            "id": "R7GKU1",
+            "type": "problem",
+            "content": "那和以前的工作（分解成若干子目标，对于完成更多子目标的轨迹奖励）的方法有什么区别",
+            "children": [
+              "3ECLER"
+            ],
+            "parentId": "MK2973"
+          },
+          "3ECLER": {
+            "id": "3ECLER",
+            "type": "evidence",
+            "content": "以前的工作还需要人工划分目标 or llm judge.而目前的方法可以用一套指标来奖励",
+            "children": [],
+            "parentId": "R7GKU1"
+          },
+          "2NAAZ3": {
+            "id": "2NAAZ3",
+            "type": "evidence",
+            "content": "还真有 2503.01307, 将 reasoning 里的认知行为分成四类",
+            "children": [],
+            "parentId": "IWWQ8C"
+          },
+          "UAC5WP": {
+            "id": "UAC5WP",
+            "type": "problem",
+            "content": "现有的研究大多集中在有限轮数上进行（如 2-3 轮）多轮是否面临数据不足，训练困难，时间长（torl 指出工具执行时 gpu 闲置）的问题",
+            "children": [],
+            "parentId": "H7HUSS"
+          },
+          "Z4CJM5": {
+            "id": "Z4CJM5",
+            "type": "evidence",
+            "content": "目前的奖励机制可以涌现相关的认知行为 （TORL）https://zhuanlan.zhihu.com/p/1928370454680298143",
+            "children": [],
+            "parentId": "MXR6CW"
+          },
+          "L9UECR": {
+            "id": "L9UECR",
+            "type": "evidence",
+            "content": "该文指出“最小化外部物理工具的使用也在最大化内部认知工具的使用。\n最大化外部物理工具的使用并不意味着最小化内部认知工具的使用”",
+            "children": [
+              "7873LS",
+              "ZU1SC3"
+            ],
+            "parentId": "TA1NAI"
+          },
+          "7873LS": {
+            "id": "7873LS",
+            "type": "hypothesis",
+            "content": "对于执行慢的工具调用确实应该减少外部工具使用。但是在并行调用和轻量化工具的情景下或许比自回归解码快。just act don't think",
+            "children": [
+              "8NXRZC",
+              "YTYM3H"
+            ],
+            "parentId": "L9UECR"
+          },
+          "8NXRZC": {
+            "id": "8NXRZC",
+            "type": "hypothesis",
+            "content": "模型能否能像人一样对于错误率高耗时长的工具不用，而对于可并行或者轻量化或者高信息密度的工具频繁调用来降低认知负担（引入一个单位时间信息密度的指标来衡量）",
+            "children": [],
+            "parentId": "7873LS"
+          },
+          "R58Z0K": {
+            "id": "R58Z0K",
+            "type": "hypothesis",
+            "content": "调用其他llm，实现 MAS\nhttps://x.com/TaNGSoFT/status/2007551921129975994?s=20",
+            "children": [
+              "S18M0J",
+              "W8MVXJ"
+            ],
+            "parentId": "6NL96S"
+          },
+          "S3GM0B": {
+            "id": "S3GM0B",
+            "type": "action",
+            "content": "其实 ReAct 也有主动选择思考，视任务而定",
+            "children": [],
+            "parentId": "LPY81I"
+          },
+          "S18M0J": {
+            "id": "S18M0J",
+            "type": "evidence",
+            "content": "https://www.alphaxiv.org/abs/2601.03872 就对多领域任务使用不同模型",
+            "children": [],
+            "parentId": "R58Z0K"
+          },
+          "W8MVXJ": {
+            "id": "W8MVXJ",
+            "type": "evidence",
+            "content": "https://arxiv.org/pdf/2506.00886 引理 2.2 就提出不同模型有bu不同的知识边界",
+            "children": [],
+            "parentId": "R58Z0K"
+          },
+          "YTYM3H": {
+            "id": "YTYM3H",
+            "type": "hypothesis",
+            "content": "ReAct 将思考和行动统一在一个空间中，那么有没有一个统一的代价来衡量动作的成本呢（有研究过度思考，有研究过度工具调用的，那是否能统一呢）",
+            "children": [
+              "82Q4Z2"
+            ],
+            "parentId": "7873LS"
+          },
+          "ZU1SC3": {
+            "id": "ZU1SC3",
+            "type": "hypothesis",
+            "content": "原文用知识边界理论来得出最小化外部物理工具是应当追求的目标。\n但认知行为理论认为应该减少认知负担。因为你很难最大化内部知识。",
+            "children": [],
+            "parentId": "L9UECR"
+          },
+          "82Q4Z2": {
+            "id": "82Q4Z2",
+            "type": "problem",
+            "content": "如何区分不同工具的代价呢？另外是往奖励函数设计一个惩罚项，还是从别的机制入手呢",
+            "children": [],
+            "parentId": "YTYM3H"
+          }
+        },
+        "rootIds": [
+          "AE71L3",
+          "KAEFYT",
+          "5LSGD8"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764155403603",
+      "name": "自然辩证法论文",
+      "createdAt": 1764155403603,
+      "updatedAt": 1768475599512,
+      "data": {
+        "nodes": {
+          "KWG63M": {
+            "id": "KWG63M",
+            "type": "topic",
+            "content": "科学技术哲学或方法或发展趋势或者创新方法的论述或感悟",
+            "children": [
+              "96T2H9",
+              "RYASIP",
+              "JIWOVH",
+              "OVALOU"
+            ],
+            "parentId": null,
+            "x": 335,
+            "y": 170
+          },
+          "96T2H9": {
+            "id": "96T2H9",
+            "type": "action",
+            "content": "知网相关论文",
+            "children": [
+              "MQDLK6"
+            ],
+            "parentId": "KWG63M"
+          },
+          "RYASIP": {
+            "id": "RYASIP",
+            "type": "action",
+            "content": "收集自然辩证法课件",
+            "children": [],
+            "parentId": "KWG63M"
+          },
+          "MQDLK6": {
+            "id": "MQDLK6",
+            "type": "evidence",
+            "content": "提供文风",
+            "children": [],
+            "parentId": "96T2H9"
+          },
+          "JIWOVH": {
+            "id": "JIWOVH",
+            "type": "evidence",
+            "content": "GEMINI 更适合收集材料，引经据典\nhttps://gemini.google.com/app/c3bab6f691f35fb7",
+            "children": [],
+            "parentId": "KWG63M"
+          },
+          "OVALOU": {
+            "id": "OVALOU",
+            "type": "evidence",
+            "content": "Deepseek 更适合中文论文\nhttps://chat.deepseek.com/a/chat/s/2cbdc3e0-2446-4d7a-ab0d-2440ff01baf8",
+            "children": [],
+            "parentId": "KWG63M"
+          }
+        },
+        "rootIds": [
+          "KWG63M"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764221769927",
+      "name": "RL-nonVR",
+      "createdAt": 1764221769927,
+      "updatedAt": 1768473521111,
+      "data": {
+        "nodes": {
+          "DSYJA8": {
+            "id": "DSYJA8",
+            "type": "topic",
+            "content": "Non-Verified Reward",
+            "children": [
+              "DT91AX",
+              "18PJBO"
+            ],
+            "parentId": null,
+            "x": -1.25,
+            "y": -15
+          },
+          "DT91AX": {
+            "id": "DT91AX",
+            "type": "action",
+            "content": "使用 Rubric anchors",
+            "children": [],
+            "parentId": "DSYJA8"
+          },
+          "EHIA07": {
+            "id": "EHIA07",
+            "type": "hypothesis",
+            "content": "学生需充分理解课程要求",
+            "children": [],
+            "parentId": "DSYJA8-1"
+          },
+          "FS8HCB": {
+            "id": "FS8HCB",
+            "type": "action",
+            "content": "编写大作业整体结构草案",
+            "children": [],
+            "parentId": "DSYJA8-1-1"
+          },
+          "18PJBO": {
+            "id": "18PJBO",
+            "type": "hypothesis",
+            "content": "Pairwise Preference Reward",
+            "children": [
+              "VUAKO9",
+              "S13Y2M",
+              "IUIQR6"
+            ],
+            "parentId": "DSYJA8"
+          },
+          "5EQ8NT": {
+            "id": "5EQ8NT",
+            "type": "hypothesis",
+            "content": "可能的方向设想",
+            "children": [],
+            "parentId": "DSYJA8-NEW"
+          },
+          "S13Y2M": {
+            "id": "S13Y2M",
+            "type": "evidence",
+            "content": "在文生图有效 https://arxiv.org/abs/2508.20751",
+            "children": [
+              "AVQ8CZ",
+              "YMJ2EF"
+            ],
+            "parentId": "18PJBO"
+          },
+          "VUAKO9": {
+            "id": "VUAKO9",
+            "type": "hypothesis",
+            "content": "将排序作为奖励",
+            "children": [
+              "M5S7V6",
+              "A343AN",
+              "WPTK7T"
+            ],
+            "parentId": "18PJBO"
+          },
+          "IUIQR6": {
+            "id": "IUIQR6",
+            "type": "hypothesis",
+            "content": "是否存在 scaling",
+            "children": [],
+            "parentId": "18PJBO"
+          },
+          "YMJ2EF": {
+            "id": "YMJ2EF",
+            "type": "action",
+            "content": "测试 pref-grpo 在社会任务是否有效",
+            "children": [
+              "I4OA6A",
+              "1XJWLN"
+            ],
+            "parentId": "S13Y2M"
+          },
+          "AVQ8CZ": {
+            "id": "AVQ8CZ",
+            "type": "problem",
+            "content": "这个奖励是否是从文本任务迁移过来的，为什么用在vision领域",
+            "children": [
+              "UY372J",
+              "FVSG9S",
+              "KDCZGQ"
+            ],
+            "parentId": "S13Y2M"
+          },
+          "I4OA6A": {
+            "id": "I4OA6A",
+            "type": "action",
+            "content": "收集任务：社会任务来自 rubric anchor",
+            "children": [
+              "MP2ZYJ",
+              "UXR3TU"
+            ],
+            "parentId": "YMJ2EF"
+          },
+          "1XJWLN": {
+            "id": "1XJWLN",
+            "type": "action",
+            "content": "魔改 pref-grpo： 基于 veRL",
+            "children": [],
+            "parentId": "YMJ2EF"
+          },
+          "MP2ZYJ": {
+            "id": "MP2ZYJ",
+            "type": "evidence",
+            "content": "EQ-bench3: 2312.06281",
+            "children": [],
+            "parentId": "I4OA6A"
+          },
+          "UXR3TU": {
+            "id": "UXR3TU",
+            "type": "evidence",
+            "content": "SocialIQA 1904.09728",
+            "children": [],
+            "parentId": "I4OA6A"
+          },
+          "M5S7V6": {
+            "id": "M5S7V6",
+            "type": "evidence",
+            "content": "排序任务比生成任务简单",
+            "children": [],
+            "parentId": "VUAKO9"
+          },
+          "A343AN": {
+            "id": "A343AN",
+            "type": "action",
+            "content": "按照 win rate 给分",
+            "children": [
+              "2ZSYV5"
+            ],
+            "parentId": "VUAKO9"
+          },
+          "WPTK7T": {
+            "id": "WPTK7T",
+            "type": "problem",
+            "content": "是否需要 COT",
+            "children": [],
+            "parentId": "VUAKO9"
+          },
+          "2ZSYV5": {
+            "id": "2ZSYV5",
+            "type": "problem",
+            "content": "判别器选择什么 LLM，这与后面结果分析有关",
+            "children": [],
+            "parentId": "A343AN"
+          },
+          "KDCZGQ": {
+            "id": "KDCZGQ",
+            "type": "evidence",
+            "content": "符合认知预期，即很难给出绝对的量化分数",
+            "children": [],
+            "parentId": "AVQ8CZ"
+          },
+          "FVSG9S": {
+            "id": "FVSG9S",
+            "type": "evidence",
+            "content": "缓解奖励破解，即使两张图都很艳丽，模型会学习到只有在符合人类审美偏好的那种“艳丽”才能赢得比较",
+            "children": [],
+            "parentId": "AVQ8CZ"
+          },
+          "UY372J": {
+            "id": "UY372J",
+            "type": "evidence",
+            "content": "避免 pointwise 模型给分类似导致 GRPO 不准",
+            "children": [],
+            "parentId": "AVQ8CZ"
+          }
+        },
+        "rootIds": [
+          "DSYJA8"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764225484320",
+      "name": "test",
+      "createdAt": 1764225484320,
+      "updatedAt": 1768475769745,
+      "data": {
+        "nodes": {
+          "2OG102": {
+            "id": "2OG102",
+            "type": "topic",
+            "content": "如何提升城市人口垃圾回收的意愿",
+            "children": [
+              "NCWQN0",
+              "WZP66D",
+              "8TOCVQ",
+              "M1XNQG",
+              "N8UBXT"
+            ],
+            "parentId": null,
+            "x": 0,
+            "y": 0
+          },
+          "NCWQN0": {
+            "id": "NCWQN0",
+            "type": "problem",
+            "content": "城市居民对垃圾分类的认知不足",
+            "children": [
+              "B0T8L4"
+            ],
+            "parentId": "2OG102"
+          },
+          "B0T8L4": {
+            "id": "B0T8L4",
+            "type": "hypothesis",
+            "content": "通过宣传教育可以提升居民认知",
+            "children": [
+              "6V9CDO",
+              "ACSP04",
+              "8RE7DB",
+              "T1GCYI"
+            ],
+            "parentId": "NCWQN0"
+          },
+          "WZP66D": {
+            "id": "WZP66D",
+            "type": "problem",
+            "content": "垃圾分类设施不够便利",
+            "children": [
+              "DHKAJ9",
+              "BB87CC"
+            ],
+            "parentId": "2OG102"
+          },
+          "8TOCVQ": {
+            "id": "8TOCVQ",
+            "type": "problem",
+            "content": "缺乏有效的激励机制",
+            "children": [
+              "VWP2PL",
+              "D4MOJ0"
+            ],
+            "parentId": "2OG102"
+          },
+          "6V9CDO": {
+            "id": "6V9CDO",
+            "type": "action",
+            "content": "在社区开展垃圾分类知识讲座和培训活动",
+            "children": [],
+            "parentId": "B0T8L4"
+          },
+          "ACSP04": {
+            "id": "ACSP04",
+            "type": "action",
+            "content": "制作垃圾分类指南手册和宣传海报",
+            "children": [],
+            "parentId": "B0T8L4"
+          },
+          "8RE7DB": {
+            "id": "8RE7DB",
+            "type": "action",
+            "content": "利用社交媒体和短视频平台推广分类知识",
+            "children": [],
+            "parentId": "B0T8L4"
+          },
+          "BB87CC": {
+            "id": "BB87CC",
+            "type": "hypothesis",
+            "content": "增加分类垃圾桶数量和优化布局可以提升便利性",
+            "children": [
+              "VMAKNL",
+              "HAOKCR"
+            ],
+            "parentId": "WZP66D"
+          },
+          "DHKAJ9": {
+            "id": "DHKAJ9",
+            "type": "hypothesis",
+            "content": "设置智能垃圾回收站可以降低分类难度",
+            "children": [
+              "VYF8GT",
+              "UW32GO"
+            ],
+            "parentId": "WZP66D"
+          },
+          "VWP2PL": {
+            "id": "VWP2PL",
+            "type": "hypothesis",
+            "content": "建立积分奖励制度可以激发居民参与热情",
+            "children": [
+              "A3B1NT",
+              "O1RSCX"
+            ],
+            "parentId": "8TOCVQ"
+          },
+          "D4MOJ0": {
+            "id": "D4MOJ0",
+            "type": "hypothesis",
+            "content": "实施垃圾费用阶梯定价可以促进减量和分类",
+            "children": [
+              "0YXOP4",
+              "7B6H1S",
+              "PBMS7U"
+            ],
+            "parentId": "8TOCVQ"
+          },
+          "VMAKNL": {
+            "id": "VMAKNL",
+            "type": "action",
+            "content": "根据社区人流量重新规划垃圾桶点位并增设缺口位置",
+            "children": [],
+            "parentId": "BB87CC"
+          },
+          "VYF8GT": {
+            "id": "VYF8GT",
+            "type": "action",
+            "content": "引入具备自动识别功能的智能回收设备并在试点区域部署",
+            "children": [],
+            "parentId": "DHKAJ9"
+          },
+          "A3B1NT": {
+            "id": "A3B1NT",
+            "type": "action",
+            "content": "开发积分制小程序，居民投递可获得积分兑换日用品",
+            "children": [],
+            "parentId": "VWP2PL"
+          },
+          "0YXOP4": {
+            "id": "0YXOP4",
+            "type": "action",
+            "content": "对超额垃圾量家庭适用更高费率，鼓励源头减量",
+            "children": [],
+            "parentId": "D4MOJ0"
+          },
+          "M1XNQG": {
+            "id": "M1XNQG",
+            "type": "problem",
+            "content": "垃圾分类的时间成本较高影响参与度",
+            "children": [
+              "24M1CR",
+              "PL4M8P"
+            ],
+            "parentId": "2OG102"
+          },
+          "N8UBXT": {
+            "id": "N8UBXT",
+            "type": "problem",
+            "content": "居民对回收结果与反馈机制缺乏信任",
+            "children": [
+              "CZHA5Q",
+              "NDO10Y"
+            ],
+            "parentId": "2OG102"
+          },
+          "24M1CR": {
+            "id": "24M1CR",
+            "type": "hypothesis",
+            "content": "简化分类流程和提供上门回收服务可以降低时间成本",
+            "children": [
+              "6QV0B3",
+              "YOGKDG"
+            ],
+            "parentId": "M1XNQG"
+          },
+          "PL4M8P": {
+            "id": "PL4M8P",
+            "type": "hypothesis",
+            "content": "设置弹性投放时间和多样化投放方式可以适应居民作息",
+            "children": [
+              "YGPIJK",
+              "BYRS3J"
+            ],
+            "parentId": "M1XNQG"
+          },
+          "CZHA5Q": {
+            "id": "CZHA5Q",
+            "type": "hypothesis",
+            "content": "建立透明的垃圾处理追溯系统可以增强居民信任",
+            "children": [
+              "7LPH2U",
+              "G49P2M"
+            ],
+            "parentId": "N8UBXT"
+          },
+          "NDO10Y": {
+            "id": "NDO10Y",
+            "type": "hypothesis",
+            "content": "定期公示回收成果和环境效益可以提升参与信心",
+            "children": [
+              "4W5AN1",
+              "1T7TZM"
+            ],
+            "parentId": "N8UBXT"
+          },
+          "6QV0B3": {
+            "id": "6QV0B3",
+            "type": "action",
+            "content": "推出预约上门回收服务，居民通过APP预约可回收物品收集",
+            "children": [],
+            "parentId": "24M1CR"
+          },
+          "YOGKDG": {
+            "id": "YOGKDG",
+            "type": "action",
+            "content": "设计简化版分类指引，将复杂分类简化为3-4个基础类别",
+            "children": [],
+            "parentId": "24M1CR"
+          },
+          "YGPIJK": {
+            "id": "YGPIJK",
+            "type": "action",
+            "content": "延长垃圾投放时段至全天候开放，取消定时定点限制",
+            "children": [],
+            "parentId": "PL4M8P"
+          },
+          "BYRS3J": {
+            "id": "BYRS3J",
+            "type": "action",
+            "content": "在写字楼和商圈设置便民临时存放点，方便上班族下班投放",
+            "children": [],
+            "parentId": "PL4M8P"
+          },
+          "7LPH2U": {
+            "id": "7LPH2U",
+            "type": "action",
+            "content": "开发垃圾追溯小程序，居民可扫码查询投放垃圾的处理全流程",
+            "children": [],
+            "parentId": "CZHA5Q"
+          },
+          "G49P2M": {
+            "id": "G49P2M",
+            "type": "action",
+            "content": "组织居民参观垃圾处理厂和再生资源利用基地，实地了解处理过程",
+            "children": [],
+            "parentId": "CZHA5Q"
+          },
+          "4W5AN1": {
+            "id": "4W5AN1",
+            "type": "action",
+            "content": "每月在社区公告栏和线上平台发布回收数据和碳减排成效报告",
+            "children": [],
+            "parentId": "NDO10Y"
+          },
+          "1T7TZM": {
+            "id": "1T7TZM",
+            "type": "action",
+            "content": "制作社区垃圾分类成果展示墙，可视化呈现环保贡献和资源再利用案例",
+            "children": [],
+            "parentId": "NDO10Y"
+          },
+          "T1GCYI": {
+            "id": "T1GCYI",
+            "type": "action",
+            "content": "在中小学开展垃圾分类教育课程，通过孩子影响家庭",
+            "children": [],
+            "parentId": "B0T8L4"
+          },
+          "HAOKCR": {
+            "id": "HAOKCR",
+            "type": "action",
+            "content": "在每栋楼层设置小型分类收集点，缩短居民投放距离",
+            "children": [],
+            "parentId": "BB87CC"
+          },
+          "UW32GO": {
+            "id": "UW32GO",
+            "type": "action",
+            "content": "配置语音提示和图像识别技术，引导居民正确投放并即时纠错",
+            "children": [],
+            "parentId": "DHKAJ9"
+          },
+          "O1RSCX": {
+            "id": "O1RSCX",
+            "type": "action",
+            "content": "与社区商家合作，积分可抵扣超市、餐饮等消费金额",
+            "children": [],
+            "parentId": "VWP2PL"
+          },
+          "7B6H1S": {
+            "id": "7B6H1S",
+            "type": "action",
+            "content": "实施垃圾袋实名制和称重计费，按量精准收费并给予分类优惠",
+            "children": [],
+            "parentId": "D4MOJ0"
+          },
+          "PBMS7U": {
+            "id": "PBMS7U",
+            "type": "action",
+            "content": "新节点...",
+            "children": [],
+            "parentId": "D4MOJ0"
+          }
+        },
+        "rootIds": [
+          "2OG102"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764333332974",
+      "name": "强化学习",
+      "createdAt": 1764333332974,
+      "updatedAt": 1768475773445,
+      "data": {
+        "nodes": {
+          "B2LMDS": {
+            "id": "B2LMDS",
+            "type": "topic",
+            "content": "强化学习",
+            "children": [
+              "G27SFK",
+              "B2UBCL"
+            ],
+            "parentId": null,
+            "x": 0,
+            "y": 0
+          },
+          "G27SFK": {
+            "id": "G27SFK",
+            "type": "problem",
+            "content": "算法学习",
+            "children": [],
+            "parentId": "B2LMDS"
+          },
+          "B2UBCL": {
+            "id": "B2UBCL",
+            "type": "problem",
+            "content": "实现框架",
+            "children": [
+              "QQWPNJ"
+            ],
+            "parentId": "B2LMDS"
+          },
+          "QQWPNJ": {
+            "id": "QQWPNJ",
+            "type": "hypothesis",
+            "content": "verl 学习（zhihu 收藏）",
+            "children": [],
+            "parentId": "B2UBCL"
+          }
+        },
+        "rootIds": [
+          "B2LMDS"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1764956973148",
+      "name": "paper-agent",
+      "createdAt": 1764956973148,
+      "updatedAt": 1768473539828,
+      "data": {
+        "nodes": {
+          "96Q7O4": {
+            "id": "96Q7O4",
+            "type": "topic",
+            "content": "paper-agent",
+            "children": [
+              "29R5RJ"
+            ],
+            "parentId": null,
+            "x": 0,
+            "y": 0
+          },
+          "29R5RJ": {
+            "id": "29R5RJ",
+            "type": "evidence",
+            "content": "组件",
+            "children": [
+              "QIFYOG"
+            ],
+            "parentId": "96Q7O4"
+          },
+          "P69ND4": {
+            "id": "P69ND4",
+            "type": "problem",
+            "content": "无 arxiv 源码",
+            "children": [
+              "WF9T6P"
+            ],
+            "parentId": "QIFYOG"
+          },
+          "Y8EII2": {
+            "id": "Y8EII2",
+            "type": "problem",
+            "content": "长上下文",
+            "children": [
+              "TA47QD"
+            ],
+            "parentId": "QIFYOG"
+          },
+          "QIFYOG": {
+            "id": "QIFYOG",
+            "type": "action",
+            "content": "获取 paper",
+            "children": [
+              "HD08Y1",
+              "P69ND4",
+              "Y8EII2"
+            ],
+            "parentId": "29R5RJ"
+          },
+          "TA47QD": {
+            "id": "TA47QD",
+            "type": "action",
+            "content": "阉割功能",
+            "children": [],
+            "parentId": "Y8EII2"
+          },
+          "WF9T6P": {
+            "id": "WF9T6P",
+            "type": "action",
+            "content": "mineru",
+            "children": [],
+            "parentId": "P69ND4"
+          },
+          "HD08Y1": {
+            "id": "HD08Y1",
+            "type": "evidence",
+            "content": "需要原始图片",
+            "children": [],
+            "parentId": "QIFYOG"
+          }
+        },
+        "rootIds": [
+          "96Q7O4"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1765475782634",
+      "name": "Agent 实验平台",
+      "createdAt": 1765475782634,
+      "updatedAt": 1768473545227,
+      "data": {
+        "nodes": {
+          "LC3Y0Z": {
+            "id": "LC3Y0Z",
+            "type": "topic",
+            "content": "Agent 实验平台",
+            "children": [
+              "AIT4BF"
+            ],
+            "parentId": null,
+            "x": 0,
+            "y": 1.25
+          },
+          "LIKFYX": {
+            "id": "LIKFYX",
+            "type": "problem",
+            "content": "环境依赖易部署，易迁移",
+            "children": [],
+            "parentId": "AIT4BF"
+          },
+          "AIT4BF": {
+            "id": "AIT4BF",
+            "type": "topic",
+            "content": "特性",
+            "children": [
+              "LIKFYX",
+              "64AAPA",
+              "BVNAP5"
+            ],
+            "parentId": "LC3Y0Z"
+          },
+          "64AAPA": {
+            "id": "64AAPA",
+            "type": "problem",
+            "content": "可靠的指标监控框架和复现",
+            "children": [],
+            "parentId": "AIT4BF"
+          },
+          "BVNAP5": {
+            "id": "BVNAP5",
+            "type": "problem",
+            "content": "灵活迁移不同算法",
+            "children": [],
+            "parentId": "AIT4BF"
+          }
+        },
+        "rootIds": [
+          "LC3Y0Z"
+        ]
+      }
+    },
+    {
+      "id": "canvas_1767068784382",
+      "name": "gpu-hw2",
+      "createdAt": 1767068784382,
+      "updatedAt": 1768475600812,
+      "data": {
+        "nodes": {
+          "CNEFDF": {
+            "id": "CNEFDF",
+            "type": "topic",
+            "content": "问答 agent",
+            "children": [
+              "J04GKY",
+              "FQHOKG"
+            ],
+            "parentId": null,
+            "x": 360,
+            "y": -138.75
+          },
+          "J04GKY": {
+            "id": "J04GKY",
+            "type": "problem",
+            "content": "微调模型达到要求准确率",
+            "children": [
+              "I67H8C",
+              "TBTKGJ",
+              "3PYK38"
+            ],
+            "parentId": "CNEFDF"
+          },
+          "I67H8C": {
+            "id": "I67H8C",
+            "type": "evidence",
+            "content": "回答里最好要包含问题里面的英文关键词.回答只对英文评分。",
+            "children": [
+              "BKQ6M5",
+              "KACL6A"
+            ],
+            "parentId": "J04GKY"
+          },
+          "TBTKGJ": {
+            "id": "TBTKGJ",
+            "type": "problem",
+            "content": "构建问答数据集",
+            "children": [
+              "1CXQ4R",
+              "5SF2NI",
+              "QHYC9J",
+              "LAEG50",
+              "HF2YQN"
+            ],
+            "parentId": "J04GKY"
+          },
+          "1CXQ4R": {
+            "id": "1CXQ4R",
+            "type": "problem",
+            "content": "选取数据清洗框架",
+            "children": [
+              "9L9OW6",
+              "9HZBC5"
+            ],
+            "parentId": "TBTKGJ"
+          },
+          "FQHOKG": {
+            "id": "FQHOKG",
+            "type": "problem",
+            "content": "模型尽可能快",
+            "children": [
+              "G8DNID",
+              "LTOZ4Y",
+              "T3OXUT",
+              "NNBXIZ",
+              "CVB96Y",
+              "0SWAWQ",
+              "V4QP9M"
+            ],
+            "parentId": "CNEFDF"
+          },
+          "G8DNID": {
+            "id": "G8DNID",
+            "type": "action",
+            "content": "实现 batch 推理",
+            "children": [
+              "0PT28F"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "9L9OW6": {
+            "id": "9L9OW6",
+            "type": "evidence",
+            "content": "easydataset",
+            "children": [
+              "4T7UBR",
+              "2893TL"
+            ],
+            "parentId": "1CXQ4R"
+          },
+          "2893TL": {
+            "id": "2893TL",
+            "type": "problem",
+            "content": "改进提示词",
+            "children": [],
+            "parentId": "9L9OW6"
+          },
+          "4T7UBR": {
+            "id": "4T7UBR",
+            "type": "problem",
+            "content": "划分章节",
+            "children": [],
+            "parentId": "9L9OW6"
+          },
+          "5SF2NI": {
+            "id": "5SF2NI",
+            "type": "problem",
+            "content": "分割pdf",
+            "children": [
+              "5GLIR3",
+              "TW8JKX"
+            ],
+            "parentId": "TBTKGJ"
+          },
+          "5GLIR3": {
+            "id": "5GLIR3",
+            "type": "action",
+            "content": "使用规则识别目录",
+            "children": [
+              "RF25K0"
+            ],
+            "parentId": "5SF2NI"
+          },
+          "RF25K0": {
+            "id": "RF25K0",
+            "type": "evidence",
+            "content": "pdf 格式不统一",
+            "children": [],
+            "parentId": "5GLIR3"
+          },
+          "TW8JKX": {
+            "id": "TW8JKX",
+            "type": "action",
+            "content": "曲线救国用 mineru 转换",
+            "children": [],
+            "parentId": "5SF2NI"
+          },
+          "9HZBC5": {
+            "id": "9HZBC5",
+            "type": "evidence",
+            "content": "现有框架过于局限",
+            "children": [],
+            "parentId": "1CXQ4R"
+          },
+          "QHYC9J": {
+            "id": "QHYC9J",
+            "type": "problem",
+            "content": "构建提示词",
+            "children": [
+              "QD5CW1",
+              "3PTEOB"
+            ],
+            "parentId": "TBTKGJ"
+          },
+          "LAEG50": {
+            "id": "LAEG50",
+            "type": "action",
+            "content": "批量 pdf llm交互逻辑",
+            "children": [],
+            "parentId": "TBTKGJ"
+          },
+          "T3OXUT": {
+            "id": "T3OXUT",
+            "type": "problem",
+            "content": "搭建测速框架",
+            "children": [
+              "26UU5F",
+              "8TB6Y0"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "26UU5F": {
+            "id": "26UU5F",
+            "type": "action",
+            "content": "搭建 5090 环境",
+            "children": [
+              "JWQUGX",
+              "NGB72P"
+            ],
+            "parentId": "T3OXUT"
+          },
+          "3PYK38": {
+            "id": "3PYK38",
+            "type": "problem",
+            "content": "微调模型",
+            "children": [
+              "MQJL4G",
+              "T3FEA1"
+            ],
+            "parentId": "J04GKY"
+          },
+          "QD5CW1": {
+            "id": "QD5CW1",
+            "type": "action",
+            "content": "ai studio 小范围测试",
+            "children": [],
+            "parentId": "QHYC9J"
+          },
+          "MQJL4G": {
+            "id": "MQJL4G",
+            "type": "action",
+            "content": "搭建 a800 环境",
+            "children": [],
+            "parentId": "3PYK38"
+          },
+          "NNBXIZ": {
+            "id": "NNBXIZ",
+            "type": "action",
+            "content": "测试不同量化策略模型的速度（批量）",
+            "children": [
+              "MYYFJI",
+              "ZROG6R"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "T3FEA1": {
+            "id": "T3FEA1",
+            "type": "hypothesis",
+            "content": "先完成测速再选择模型进行微调",
+            "children": [
+              "4O7R8M"
+            ],
+            "parentId": "3PYK38"
+          },
+          "8TB6Y0": {
+            "id": "8TB6Y0",
+            "type": "action",
+            "content": "导入测试集测试准确率",
+            "children": [],
+            "parentId": "T3OXUT"
+          },
+          "JWQUGX": {
+            "id": "JWQUGX",
+            "type": "evidence",
+            "content": "https://docs.qq.com/doc/DT2pNZm13VktMbG9U",
+            "children": [],
+            "parentId": "26UU5F"
+          },
+          "3PTEOB": {
+            "id": "3PTEOB",
+            "type": "problem",
+            "content": "相关原则",
+            "children": [
+              "BM19NN",
+              "6QY4AW"
+            ],
+            "parentId": "QHYC9J"
+          },
+          "BM19NN": {
+            "id": "BM19NN",
+            "type": "hypothesis",
+            "content": "英语关键词",
+            "children": [],
+            "parentId": "3PTEOB"
+          },
+          "6QY4AW": {
+            "id": "6QY4AW",
+            "type": "hypothesis",
+            "content": "问题多样性",
+            "children": [],
+            "parentId": "3PTEOB"
+          },
+          "BKQ6M5": {
+            "id": "BKQ6M5",
+            "type": "action",
+            "content": "回答时复述一遍问题",
+            "children": [],
+            "parentId": "I67H8C"
+          },
+          "KACL6A": {
+            "id": "KACL6A",
+            "type": "action",
+            "content": "附上更多英语关键词",
+            "children": [],
+            "parentId": "I67H8C"
+          },
+          "CVB96Y": {
+            "id": "CVB96Y",
+            "type": "action",
+            "content": "回复尽可能短一点，设置max'tokens",
+            "children": [
+              "A6WE3E"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "0PT28F": {
+            "id": "0PT28F",
+            "type": "evidence",
+            "content": "安装nvidia-container：  [并行docker构建vllm全流程.md](assets/并行docker构建vllm全流程-20260101203903-gl4yqou.md) (来自并行微信群唐湘铸同学，另外的链接 [https://paste.ubuntu.com/p/dSVjkB2JrK/](https://paste.ubuntu.com/p/dSVjkB2JrK/))\n\n\n[国科大GPU大作业二：训练-推理-部署一条龙服务](https://zhuanlan.zhihu.com/p/1989745632907371064) 部署容器和推理代码优化",
+            "children": [],
+            "parentId": "G8DNID"
+          },
+          "LTOZ4Y": {
+            "id": "LTOZ4Y",
+            "type": "hypothesis",
+            "content": "投机取样",
+            "children": [
+              "QQK1FS"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "QQK1FS": {
+            "id": "QQK1FS",
+            "type": "action",
+            "content": "实测收益为负，因为基模太小了",
+            "children": [],
+            "parentId": "LTOZ4Y"
+          },
+          "MYYFJI": {
+            "id": "MYYFJI",
+            "type": "evidence",
+            "content": "直接使用 fp4 效果不佳",
+            "children": [],
+            "parentId": "NNBXIZ"
+          },
+          "ZROG6R": {
+            "id": "ZROG6R",
+            "type": "hypothesis",
+            "content": "尝试使用 modelcompress",
+            "children": [],
+            "parentId": "NNBXIZ"
+          },
+          "0SWAWQ": {
+            "id": "0SWAWQ",
+            "type": "hypothesis",
+            "content": "将 prompt 预处理为 emb\nhttps://docs.vllm.ai/en/latest/features/prompt_embeds/#offline-inference",
+            "children": [
+              "UGWUOJ",
+              "1L513Q"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "1L513Q": {
+            "id": "1L513Q",
+            "type": "action",
+            "content": "比较无 prompt，有 prompt，预处理前后的速度",
+            "children": [],
+            "parentId": "0SWAWQ"
+          },
+          "UGWUOJ": {
+            "id": "UGWUOJ",
+            "type": "hypothesis",
+            "content": "让模型将重点答案放前面",
+            "children": [],
+            "parentId": "0SWAWQ"
+          },
+          "NGB72P": {
+            "id": "NGB72P",
+            "type": "action",
+            "content": "切换不同的赛道",
+            "children": [],
+            "parentId": "26UU5F"
+          },
+          "4O7R8M": {
+            "id": "4O7R8M",
+            "type": "hypothesis",
+            "content": "gemma-0.3b\nkurisu725/Qwen2.5-0.5b-gpu-pro",
+            "children": [],
+            "parentId": "T3FEA1"
+          },
+          "A6WE3E": {
+            "id": "A6WE3E",
+            "type": "evidence",
+            "content": "max token 小则准确率低，max token 大则速度慢",
+            "children": [
+              "QJQ923"
+            ],
+            "parentId": "CVB96Y"
+          },
+          "V4QP9M": {
+            "id": "V4QP9M",
+            "type": "hypothesis",
+            "content": "分解问题，增大并发度",
+            "children": [
+              "4YV88F",
+              "LDVUKZ"
+            ],
+            "parentId": "FQHOKG"
+          },
+          "4YV88F": {
+            "id": "4YV88F",
+            "type": "problem",
+            "content": "如何分解问题，根据关键词模式分解",
+            "children": [
+              "KCFYAK"
+            ],
+            "parentId": "V4QP9M"
+          },
+          "LDVUKZ": {
+            "id": "LDVUKZ",
+            "type": "action",
+            "content": "二分查找最适合的批量数,同时控制运行时间小于360s",
+            "children": [],
+            "parentId": "V4QP9M"
+          },
+          "KCFYAK": {
+            "id": "KCFYAK",
+            "type": "action",
+            "content": "根据公开数据分析模式",
+            "children": [],
+            "parentId": "4YV88F"
+          },
+          "QJQ923": {
+            "id": "QJQ923",
+            "type": "action",
+            "content": "统计测试集回复的 token",
+            "children": [],
+            "parentId": "A6WE3E"
+          },
+          "HF2YQN": {
+            "id": "HF2YQN",
+            "type": "hypothesis",
+            "content": "过拟合公开数据集即可",
+            "children": [],
+            "parentId": "TBTKGJ"
+          }
+        },
+        "rootIds": [
+          "CNEFDF"
+        ]
+      }
+    }
+  ],
+  "conversations": []
+}
