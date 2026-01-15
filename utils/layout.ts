@@ -465,16 +465,6 @@ export const getLayoutBounds = (nodes: LayoutNode[], padding: number = 100, node
     };
 };
 
-// --- Agent Helpers ---
-export const serializeForestForAgent = (project: MindMapProject) => {
-    return Object.values(project.nodes).map(node => ({
-        id: node.id,
-        parentId: node.parentId,
-        type: node.type,
-        content: node.content
-    }));
-};
-
 /**
  * 导出保存时仅保留节点树必要字段。
  */

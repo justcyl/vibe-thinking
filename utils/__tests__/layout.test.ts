@@ -5,7 +5,6 @@ import {
   getFormattedGlobalContextString,
   getLayoutBounds,
   reparentNode,
-  serializeForestForAgent,
   serializeProjectForExport,
   updateNode
 } from '@/utils/layout';
@@ -206,18 +205,4 @@ describe('layout utilities', () => {
     });
   });
 
-  it('序列化森林数据供 Agent 使用', () => {
-    const project = createProject();
-    const serialized = serializeForestForAgent(project);
-
-    const expectedEntries = Object.values(project.nodes).map(({ id, parentId, type, content }) => ({
-      id,
-      parentId,
-      type,
-      content
-    }));
-
-    expect(serialized).toEqual(expectedEntries);
-    expect(serialized).toHaveLength(expectedEntries.length);
-  });
 });

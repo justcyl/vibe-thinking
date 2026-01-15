@@ -1,6 +1,5 @@
 import { MindMapViewModel } from '@/viewmodels/useMindMapViewModel';
 import { Whiteboard } from '@/components/Whiteboard';
-import { AgentPanel } from '@/components/AgentPanel';
 import { CanvasDrawer } from '@/components/layout/CanvasDrawer';
 import {
   Sparkles,
@@ -15,7 +14,6 @@ import {
   Menu,
   Plus,
   Clipboard,
-  Bot,
   FileJson,
 } from 'lucide-react';
 
@@ -71,26 +69,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
     setTempCanvasName,
     startRename,
     saveRename,
-    isAgentOpen,
-    toggleAgent,
-    closeAgent,
-    agentMessages,
-    sendAgentMessage,
-    isAgentProcessing,
-    agentPanelWidth,
-    startResizing,
-    availableNodes,
-    selectedModel,
-    setSelectedModel,
-    currentConversation,
-    conversations,
-    newConversation,
-    selectConversation,
-    deleteConversation,
-    showHistory,
-    setShowHistory,
-    pendingToolCalls,
-    streamingText,
   } = viewModel;
 
   const topBtnStyle =
@@ -119,9 +97,7 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
         onClose={closeSidebar}
       />
 
-      {/* Main content area with flex layout for split-screen */}
       <main className="flex-1 flex overflow-hidden">
-        {/* Whiteboard area */}
         <div className="flex-1 flex flex-col relative overflow-hidden">
           <div className="flex-1 relative w-full h-full">
             <Whiteboard
@@ -217,10 +193,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
                 <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className={isSettingsOpen ? topBtnActiveStyle : topBtnStyle}>
                   <Settings size={16} />
                 </button>
-
-                <button onClick={toggleAgent} className={isAgentOpen ? topBtnActiveStyle : topBtnStyle}>
-                  <Bot size={18} />
-                </button>
               </div>
             </div>
 
@@ -293,43 +265,6 @@ export const MindMapView = ({ viewModel }: MindMapViewProps) => {
             )}
           </div>
         </div>
-
-        {/* Agent Panel - Split screen layout */}
-        {isAgentOpen && (
-          <div
-            style={{ width: agentPanelWidth }}
-            className={`flex-shrink-0 border-l flex flex-col relative ${viewSettings.theme === 'dark' ? 'bg-[#18181b] border-neutral-800' : 'bg-white border-neutral-200'}`}
-          >
-            {/* Resize handle */}
-            <div
-              className="absolute top-0 left-0 bottom-0 w-[4px] cursor-col-resize z-50 hover:bg-blue-500/30 transition-colors"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startResizing();
-              }}
-            />
-            <AgentPanel
-              isOpen={isAgentOpen}
-              onClose={closeAgent}
-              messages={agentMessages}
-              onSendMessage={sendAgentMessage}
-              isProcessing={isAgentProcessing}
-              theme={viewSettings.theme}
-              availableNodes={availableNodes}
-              selectedModel={selectedModel}
-              onModelChange={setSelectedModel}
-              currentConversation={currentConversation}
-              conversations={conversations}
-              onNewConversation={newConversation}
-              onSelectConversation={selectConversation}
-              onDeleteConversation={deleteConversation}
-              showHistory={showHistory}
-              onShowHistoryChange={setShowHistory}
-              pendingToolCalls={pendingToolCalls}
-              streamingText={streamingText}
-            />
-          </div>
-        )}
       </main>
     </div>
   );

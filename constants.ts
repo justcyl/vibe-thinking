@@ -1,6 +1,6 @@
 
-import { NodeType, MindMapProject, NodeSize, ModelOption } from './types';
-import { Lightbulb, Search, Box, AlertCircle, Play, Paperclip, AtSign, File, GripVertical } from 'lucide-react';
+import { NodeType, MindMapProject, NodeSize } from './types';
+import { Lightbulb, Search, Box, AlertCircle, Play } from 'lucide-react';
 
 // Minimalist Dark Theme with Colored Headers - Updated for vibrancy
 const DARK_COLORS = {
@@ -213,23 +213,4 @@ export const LABELS = {
   deleteCanvas: "删除",
   renameCanvas: "重命名",
   confirmDelete: "确认删除画布？",
-  agentTitle: "思维助理",
-  agentWelcome: "我是您的思维助理。输入指令或使用 @ 引用节点。",
-  agentPlaceholder: "输入指令 / 使用 @ 引用节点...",
-  agentSending: "正在处理...",
 };
-
-export const AGENT_ICONS = {
-    Paperclip,
-    AtSign,
-    File,
-    GripVertical
-};
-
-// --- Model Options ---
-export const MODEL_OPTIONS: ModelOption[] = [
-  { id: 'gpt-5.1', name: 'GPT-5.1', provider: 'OpenAI' },
-  { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
-];
-
-export const DEFAULT_MODEL_ID = 'claude-sonnet-4-5';

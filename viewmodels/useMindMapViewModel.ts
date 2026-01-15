@@ -6,12 +6,6 @@ import {
   NodeType,
   ViewSettings,
   Canvas,
-  AgentMessage,
-  Theme,
-  Orientation,
-  ModelId,
-  Conversation,
-  ToolCall,
 } from '@/types';
 import {
   addNode,
@@ -30,7 +24,6 @@ import {
 import { generateBrainstormIdeas } from '@/services/claudeService';
 import { useCanvasManager } from '@/hooks/useCanvasManager';
 import { useHistoryManager } from '@/hooks/useHistoryManager';
-import { useAgentInterface } from '@/hooks/useAgentInterface';
 
 export interface MindMapViewModel {
   t: typeof LABELS;
@@ -83,29 +76,6 @@ export interface MindMapViewModel {
   startRename: (canvasId: string, source: 'sidebar' | 'header') => void;
   saveRename: (canvasId: string, name?: string) => void;
   getCurrentCanvasId: () => string;
-  isAgentOpen: boolean;
-  toggleAgent: () => void;
-  closeAgent: () => void;
-  agentPanelWidth: number;
-  startResizing: () => void;
-  agentMessages: AgentMessage[];
-  isAgentProcessing: boolean;
-  sendAgentMessage: ReturnType<typeof useAgentInterface>['sendMessage'];
-  availableNodes: ReturnType<typeof useAgentInterface>['availableNodes'];
-  selectedModel: ModelId;
-  setSelectedModel: (model: ModelId) => void;
-  // 对话管理
-  currentConversation: Conversation | null;
-  conversations: Conversation[];
-  newConversation: () => void;
-  selectConversation: (id: string) => void;
-  deleteConversation: (id: string) => void;
-  showHistory: boolean;
-  setShowHistory: (show: boolean) => void;
-  // 工具调用状态
-  pendingToolCalls: ToolCall[];
-  // 流式文本
-  streamingText: string;
 }
 
 const getNextLogicalType = (parentType: NodeType): NodeType => {
@@ -183,35 +153,6 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     });
     return ids;
   }, [canvases]);
-
-  const {
-    isAgentOpen,
-    toggleAgent,
-    closeAgent,
-    agentPanelWidth,
-    startResizing,
-    messages: agentMessages,
-    isAgentProcessing,
-    sendMessage,
-    availableNodes,
-    selectedModel,
-    setSelectedModel,
-    currentConversation,
-    conversations,
-    newConversation,
-    selectConversation,
-    deleteConversation,
-    showHistory,
-    setShowHistory,
-    pendingToolCalls,
-    streamingText,
-  } = useAgentInterface({
-    data,
-    pushState,
-    getGlobalNodeIds,
-    currentCanvasId,
-    currentCanvasName: currentCanvas?.name || '',
-  });
 
   const latestProjectRef = useRef<MindMapProject>(data);
 
@@ -541,25 +482,5 @@ export const useMindMapViewModel = (): MindMapViewModel => {
     startRename,
     saveRename,
     getCurrentCanvasId,
-    isAgentOpen,
-    toggleAgent,
-    closeAgent,
-    agentPanelWidth,
-    startResizing,
-    agentMessages,
-    isAgentProcessing,
-    sendAgentMessage: sendMessage,
-    availableNodes,
-    selectedModel,
-    setSelectedModel,
-    currentConversation,
-    conversations,
-    newConversation,
-    selectConversation,
-    deleteConversation,
-    showHistory,
-    setShowHistory,
-    pendingToolCalls,
-    streamingText,
   };
 };
