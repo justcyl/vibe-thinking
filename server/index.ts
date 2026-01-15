@@ -13,21 +13,15 @@ dotenvConfig();
 const ANTHROPIC_AUTH_TOKEN = process.env.ANTHROPIC_AUTH_TOKEN;
 const ANTHROPIC_BASE_URL = process.env.ANTHROPIC_BASE_URL;
 
-// 验证必需的环境变量
-if (!ANTHROPIC_AUTH_TOKEN || ANTHROPIC_AUTH_TOKEN === 'your_api_key_here') {
-  console.error('❌ Error: ANTHROPIC_AUTH_TOKEN is not configured in .env file');
-  console.error('');
-  console.error('Please edit .env file and set:');
-  console.error('  ANTHROPIC_AUTH_TOKEN=your_api_key');
-  console.error('  ANTHROPIC_BASE_URL=http://your-api-endpoint (optional)');
-  console.error('');
-  process.exit(1);
-}
+const hasAnthropicToken = Boolean(ANTHROPIC_AUTH_TOKEN && ANTHROPIC_AUTH_TOKEN !== 'your_api_key_here');
 
-// 显示配置信息
-console.log('✅ ANTHROPIC_AUTH_TOKEN loaded');
-if (ANTHROPIC_BASE_URL) {
-  console.log(`✅ Using custom endpoint: ${ANTHROPIC_BASE_URL}`);
+if (hasAnthropicToken) {
+  console.log('✅ ANTHROPIC_AUTH_TOKEN loaded');
+  if (ANTHROPIC_BASE_URL) {
+    console.log(`✅ Using custom endpoint: ${ANTHROPIC_BASE_URL}`);
+  }
+} else {
+  console.warn('⚠️  ANTHROPIC_AUTH_TOKEN 未配置，仅可使用本地存储接口');
 }
 
 const app = express();
@@ -114,6 +108,10 @@ app.post('/api/agent/chat', async (req, res) => {
 
   if (!message || !currentMapData) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (!hasAnthropicToken) {
+    return res.status(503).json({ error: 'ANTHROPIC_AUTH_TOKEN is not configured' });
   }
 
   // Generate session ID
@@ -217,6 +215,10 @@ app.post('/api/brainstorm', async (req, res) => {
 
   if (!parentContent || !parentType) {
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (!hasAnthropicToken) {
+    return res.status(503).json({ error: 'ANTHROPIC_AUTH_TOKEN is not configured' });
   }
 
   try {
