@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config as dotenvConfig } from 'dotenv';
 import { query } from '@anthropic-ai/claude-agent-sdk';
 import { mindMapMcpServer, getOperations, clearOperations } from './mindMapMcp.js';
+import { getStorageState, updateStorageState } from './storage.js';
 import { randomBytes } from 'crypto';
 
 // 从 .env 文件加载环境变量
@@ -57,6 +58,54 @@ Guidelines:
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/storage/canvases', async (_req, res) => {
+  try {
+    const state = await getStorageState();
+    res.json({ canvases: state.canvases });
+  } catch (error: any) {
+    console.error('Failed to load canvases', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/storage/canvases', async (req, res) => {
+  const { canvases } = req.body;
+  if (!Array.isArray(canvases)) {
+    return res.status(400).json({ error: 'Invalid canvases payload' });
+  }
+  try {
+    const state = await updateStorageState({ canvases });
+    res.json({ canvases: state.canvases });
+  } catch (error: any) {
+    console.error('Failed to save canvases', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/storage/conversations', async (_req, res) => {
+  try {
+    const state = await getStorageState();
+    res.json({ conversations: state.conversations });
+  } catch (error: any) {
+    console.error('Failed to load conversations', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/storage/conversations', async (req, res) => {
+  const { conversations } = req.body;
+  if (!Array.isArray(conversations)) {
+    return res.status(400).json({ error: 'Invalid conversations payload' });
+  }
+  try {
+    const state = await updateStorageState({ conversations });
+    res.json({ conversations: state.conversations });
+  } catch (error: any) {
+    console.error('Failed to save conversations', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Stream agent response using SSE
